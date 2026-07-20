@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Góc Nhỏ Nạp Năng Lượng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: background 0.8s ease;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .quote-box {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .author {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+
+        button {
+            background-color: #fff;
+            color: #333;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            background-color: #f0f0f0;
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>✨ Góc Nạp Động Lực ✨</h1>
+        <div class="quote-box">
+            <p class="quote" id="quote">"Hành trình vạn dặm bắt đầu từ một bước chân."</p>
+            <p class="author" id="author">— Lão Tử</p>
+        </div>
+        <button onclick="generateBoost()">Đổi Không Khí!</button>
+    </div>
+
+    <script>
+        const quotes = [
+            { quote: "Hành trình vạn dặm bắt đầu từ một bước chân.", author: "Lão Tử" },
+            { quote: "Cách tốt nhất để dự đoán tương lai là tự tạo ra nó.", author: "Abraham Lincoln" },
+            { quote: "Thành công không phải là đích đến, đó là một hành trình.", author: "Zig Ziglar" },
+            { quote: "Mọi thứ bạn từng muốn đều nằm ở phía bên kia của sự sợ hãi.", author: "George Addair" },
+            { quote: "Đừng chờ đợi cơ hội, hãy tự tạo ra nó.", author: "Khuyết danh" },
+            { quote: "Mỗi ngày mới là một cơ hội để làm tốt hơn ngày hôm qua.", author: "Khuyết danh" }
+        ];
+
+        const gradients = [
+            'linear-gradient(135deg, #667eea, #764ba2)',
+            'linear-gradient(135deg, #ff9a9e, #fecfef)',
+            'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+            'linear-gradient(135deg, #84fab0, #8fd3f4)',
+            'linear-gradient(135deg, #fccb90, #d57eeb)',
+            'linear-gradient(135deg, #e0c3fc, #8ec5fc)'
+        ];
+
+        function generateBoost() {
+            // Lấy ngẫu nhiên câu nói
+            const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
+            document.getElementById('quote').innerText = `"${quotes[randomQuoteIndex].quote}"`;
+            document.getElementById('author').innerText = `— ${quotes[randomQuoteIndex].author}`;
+
+            // Lấy ngẫu nhiên màu nền
+            const randomGradientIndex = Math.floor(Math.random() * gradients.length);
+            document.body.style.background = gradients[randomGradientIndex];
+        }
+    </script>
+
+</body>
+</html>
