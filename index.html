@@ -16,6 +16,7 @@
             --text-muted: #64748b;
             --accent: #06b6d4;
             --border: #e2e8f0;
+            --danger: #ef4444;
         }
 
         * {
@@ -163,11 +164,35 @@
             border: 1px solid var(--border);
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .web-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+        }
+
+        .delete-btn {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+            font-size: 0.9rem;
+        }
+
+        .admin-mode .delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .card-img-wrapper {
@@ -350,7 +375,9 @@
     <div class="container">
         <h2 class="section-title">DANH SÁCH TRANG WEB</h2>
         <div class="web-grid" id="webGrid">
+            <!-- Web card mẫu -->
             <div class="web-card">
+                <button class="delete-btn" onclick="deleteCard(this)" title="Xóa thẻ này"><i class="fa-solid fa-trash"></i></button>
                 <div class="card-img-wrapper">
                     <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80" alt="Preview">
                 </div>
@@ -445,8 +472,9 @@
         function checkAdmin() {
             const pass = document.getElementById('adminPass').value;
             if (pass === '123456') {
-                alert('Mật khẩu đúng! Đã hiện nút (+) để thêm web mới.');
+                alert('Mật khẩu đúng! Đã hiện nút (+) thêm web và nút (🗑️) xóa web.');
                 document.getElementById('addBtn').style.display = 'block';
+                document.body.classList.add('admin-mode');
             } else {
                 alert('Mật khẩu không đúng!');
             }
@@ -466,6 +494,7 @@
             const card = document.createElement('div');
             card.className = 'web-card';
             card.innerHTML = `
+                <button class="delete-btn" onclick="deleteCard(this)" title="Xóa thẻ này"><i class="fa-solid fa-trash"></i></button>
                 <div class="card-img-wrapper"><img src="${img}"></div>
                 <div class="card-content">
                     <a href="${url}" target="_blank" class="card-link">${url}</a>
@@ -474,6 +503,12 @@
             `;
             grid.appendChild(card);
             closeAddModal();
+        }
+
+        function deleteCard(btn) {
+            if (confirm('Bạn có chắc chắn muốn xóa trang web này?')) {
+                btn.closest('.web-card').remove();
+            }
         }
     </script>
 </body>
