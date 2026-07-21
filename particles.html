@@ -2,18 +2,18 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Multi-Core Particle Simulation</title>
+    <title>Multi-Core Particle Test</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; color: #fff; font-family: monospace; }
-        #ui { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; }
+        body { margin: 0; background: #050505; overflow: hidden; color: #fff; font-family: monospace; }
+        #ui { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 12px; border-radius: 6px; border: 1px solid #333; }
         canvas { display: block; }
     </style>
 </head>
 <body>
     <div id="ui">
-        <div>Số nhân CPU đang dùng: <b id="threads">0</b></div>
-        <div>Tổng số hạt: <b id="count">0</b></div>
-        <div>FPS: <b id="fps">0</b></div>
+        <div>Số nhân CPU dùng: <b id="threads" style="color: #00ffcc;">0</b></div>
+        <div>Tổng số hạt: <b id="count" style="color: #00ffcc;">0</b></div>
+        <div>FPS: <b id="fps" style="color: #ffaa00;">0</b></div>
     </div>
     <canvas id="canvas"></canvas>
 
@@ -26,33 +26,43 @@
         const numThreads = navigator.hardwareConcurrency || 4;
         document.getElementById('threads').innerText = numThreads;
 
-        // Số hạt trên mỗi thread (Ví dụ 50,000 hạt / thread)
-        const particlesPerThread = 30000; 
+        // Số hạt trên mỗi nhân CPU (chỉnh lên/xuống tùy ý)
+        const particlesPerThread = 20000; 
         const totalParticles = numThreads * particlesPerThread;
         document.getElementById('count').innerText = totalParticles.toLocaleString();
 
-        // Mã code cho Worker chạy trên từng nhân CPU
+        // Code chạy riêng trên từng nhân CPU
         const workerCode = `
-            let particles;
+            let x, y, vx, vy, count, w, h;
+
             self.onmessage = function(e) {
-                const { type, count, width, height } = e.data;
-                if (type === 'init') {
-                    particles = new Float32Array(count * 4); // x, y, vx, vy
-                    for (let i = 0; i < count * 4; i += 4) {
-                        particles[i] = Math.random() * width;
-                        particles[i+1] = Math.random() * height;
-                        particles[i+2] = (Math.random() - 0.5) * 2;
-                        particles[i+3] = (Math.random() - 0.5) * 2;
+                if (e.data.type === 'init') {
+                    count = e.data.count;
+                    w = e.data.w;
+                    h = e.data.h;
+                    x = new Float32Array(count);
+                    y = new Float32Array(count);
+                    vx = new Float32Array(count);
+                    vy = new Float32Array(count);
+
+                    for (let i = 0; i < count; i++) {
+                        x[i] = Math.random() * w;
+                        y[i] = Math.random() * h;
+                        vx[i] = (Math.random() - 0.5) * 3;
+                        vy[i] = (Math.random() - 0.5) * 3;
                     }
-                } else if (type === 'update') {
-                    for (let i = 0; i < particles.length; i += 4) {
-                        particles[i] += particles[i+2];
-                        particles[i+1] += particles[i+3];
-                        if (particles[i] < 0 || particles[i] > width) particles[i+2] *= -1;
-                        if (particles[i+1] < 0 || particles[i+1] > height) particles[i+3] *= -1;
-                    }
-                    self.postMessage(particles.buffer, [particles.buffer]);
                 }
+
+                // Cập nhật vị trí hạt
+                for (let i = 0; i < count; i++) {
+                    x[i] += vx[i];
+                    y[i] += vy[i];
+                    if (x[i] < 0 || x[i] > w) vx[i] *= -1;
+                    if (y[i] < 0 || y[i] > h) vy[i] *= -1;
+                }
+
+                // Gửi tọa độ về cho giao diện chính vẽ
+                self.postMessage({ x: x, y: y });
             };
         `;
 
@@ -60,14 +70,14 @@
         const workerUrl = URL.createObjectURL(blob);
 
         const workers = [];
-        const workerBuffers = [];
+        const threadData = [];
 
         for (let i = 0; i < numThreads; i++) {
             const w = new Worker(workerUrl);
-            w.postMessage({ type: 'init', count: particlesPerThread, width: canvas.width, height: canvas.height });
+            w.postMessage({ type: 'init', count: particlesPerThread, w: canvas.width, h: canvas.height });
             
             w.onmessage = function(e) {
-                workerBuffers[i] = new Float32Array(e.data);
+                threadData[i] = e.data;
             };
             workers.push(w);
         }
@@ -76,19 +86,19 @@
         let frames = 0;
 
         function render() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            // Hiệu ứng vệt mờ (Trail)
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.25)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#00ffcc';
 
             for (let i = 0; i < numThreads; i++) {
-                if (workerBuffers[i]) {
-                    const buf = workerBuffers[i];
-                    for (let j = 0; j < buf.length; j += 4) {
-                        ctx.fillRect(buf[j], buf[j+1], 1.5, 1.5);
+                if (threadData[i]) {
+                    const { x, y } = threadData[i];
+                    for (let j = 0; j < x.length; j++) {
+                        ctx.fillRect(x[j], y[j], 1.5, 1.5);
                     }
-                    // Gửi lại dữ liệu cho worker tiếp tục tính toán
-                    workers[i].postMessage({ type: 'update' }, [buf.buffer]);
-                    workerBuffers[i] = null;
+                    // Báo nhân CPU tính toán khung hình tiếp theo
+                    workers[i].postMessage('update');
                 }
             }
 
@@ -103,7 +113,8 @@
             requestAnimationFrame(render);
         }
 
-        setTimeout(render, 500);
+        // Đợi 100ms cho các Worker khởi tạo xong rồi phát hình
+        setTimeout(render, 100);
     </script>
 </body>
 </html>
