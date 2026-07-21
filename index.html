@@ -4,511 +4,669 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Chủ - Nguyễn Thái Dương</title>
+    <!-- Tailwind CSS để tạo giao diện nhanh, mượt -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome dùng cho các icon Facebook, Tiktok, Discord, Star... -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent: #06b6d4;
-            --border: #e2e8f0;
-            --danger: #ef4444;
+    <!-- Google Font Plus Jakarta Sans cho chữ sắc nét -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
         }
+    </script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+    <style>
+        body {
+            background-color: #fafafa;
             scroll-behavior: smooth;
         }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            overflow-x: hidden;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #818cf8;
+        }
+        /* Hiệu ứng mượt cho tiêu đề biến mất khi cuộn */
+        #hero-title {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            will-change: transform, opacity;
+        }
+        /* Thiết lập kính mờ cho thanh Menu */
         nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5%;
-            z-index: 1000;
-        }
-
-        .nav-logo {
-            font-size: 1.25rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .nav-btn {
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 8px 14px;
-            border-radius: 20px;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f1f5f9;
-            border: none;
-            cursor: pointer;
-        }
-
-        .nav-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .social-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            text-decoration: none;
-            transition: all 0.25s ease;
-        }
-
-        .social-icon:hover {
-            transform: translateY(-3px);
-            color: white;
-        }
-
-        .social-icon.facebook:hover { background: #1877f2; }
-        .social-icon.tiktok:hover { background: #000000; }
-        .social-icon.discord:hover { background: #5865f2; }
-
-        .hero {
-            height: 75vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-            margin-top: 70px;
-            position: relative;
-        }
-
-        .hero h1 {
-            font-size: 4.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1e293b 0%, var(--primary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: all 0.4s ease;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-top: 15px;
-            max-width: 600px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .web-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .web-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .web-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
-        }
-
-        .delete-btn {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
-            font-size: 0.9rem;
-        }
-
-        .admin-mode .delete-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card-img-wrapper {
-            height: 180px;
-            overflow: hidden;
-            background: #e2e8f0;
-        }
-
-        .card-img-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-content {
-            padding: 20px;
-        }
-
-        .card-link {
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 8px;
-            word-break: break-all;
-        }
-
-        .card-desc {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 450px;
-            position: relative;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 15px;
-            font-size: 1.3rem;
-            cursor: pointer;
-        }
-
-        .star-rating {
-            display: flex;
-            gap: 6px;
-            font-size: 1.5rem;
-            color: #cbd5e1;
-            cursor: pointer;
-            margin: 10px 0;
-        }
-
-        .star-rating i.active { color: #f59e0b; }
-
-        textarea, input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-top: 6px;
-            margin-bottom: 12px;
-            outline: none;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 10px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .thanks-section {
-            text-align: center;
-            padding: 50px 20px;
-        }
-
-        .thanks-section h2 { color: var(--primary); }
-
-        footer {
-            background: #090d16;
-            color: #94a3b8;
-            padding: 30px 20px;
-            font-size: 0.85rem;
-        }
-
-        .footer-content {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .admin-auth {
-            display: flex;
-            gap: 6px;
-        }
-
-        .admin-auth input {
-            margin: 0;
-            padding: 6px 10px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: white;
-        }
-
-        .admin-auth button {
-            padding: 6px 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .add-btn-float {
-            display: none;
-            position: fixed;
-            bottom: 25px; right: 25px;
-            width: 55px; height: 55px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            font-size: 1.6rem;
-            border: none;
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
-            cursor: pointer;
-            z-index: 1000;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
     </style>
 </head>
-<body>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <nav>
-        <div class="nav-logo">DUONG.SITE</div>
-        <div class="nav-links">
-            <a href="https://github.com/duongngoo2k11-sketch" target="_blank" class="nav-btn">
-                <i class="fa-brands fa-github"></i>
-                <span>Kho lưu trữ / Mã nguồn</span>
+    <nav class="fixed top-0 left-0 right-0 h-20 bg-white/80 border-b border-slate-100 flex justify-between items-center px-4 md:px-12 z-50 shadow-sm transition-all duration-300">
+        <!-- Logo/Tên thương hiệu -->
+        <div class="flex items-center gap-2">
+            <span class="text-2xl font-extrabold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">DUONG.SITE</span>
+        </div>
+
+        <!-- Các ô nút chức năng trên Header -->
+        <div class="flex items-center gap-3 md:gap-5">
+            <!-- Ô 1: Kho lưu trữ / Mã nguồn dẫn đến GitHub -->
+            <a href="https://github.com/duongngoo2k11-sketch" target="_blank" class="flex items-center gap-2 bg-slate-50 hover:bg-violet-50 text-slate-700 hover:text-violet-600 px-3 py-2 md:px-4 md:py-2.5 rounded-full font-semibold text-xs md:text-sm border border-slate-100 transition-all duration-200 shadow-sm hover:shadow">
+                <i class="fa-brands fa-github text-base md:text-lg"></i>
+                <span class="hidden sm:inline">Mã nguồn / GitHub</span>
             </a>
-            <button class="nav-btn" onclick="openReviewModal()">
-                <i class="fa-solid fa-star"></i>
-                <span>Đánh giá & Phản hồi</span>
+
+            <!-- Ô 2: Đánh giá & Phản hồi -->
+            <button onclick="openModal('reviewModal')" class="flex items-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 md:px-4 md:py-2.5 rounded-full font-semibold text-xs md:text-sm border border-amber-100 transition-all duration-200 shadow-sm hover:shadow">
+                <i class="fa-solid fa-star text-base md:text-lg animate-pulse"></i>
+                <span>Phản hồi</span>
             </button>
-            <div class="social-icons">
-                <a href="https://www.facebook.com/profile.php?id=61568473183500" target="_blank" class="social-icon facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="https://www.tiktok.com/@66dng.nguyn" target="_blank" class="social-icon tiktok"><i class="fa-brands fa-tiktok"></i></a>
-                <a href="https://discord.com" target="_blank" class="social-icon discord" title="Discord: Duongggggowo"><i class="fa-brands fa-discord"></i></a>
+
+            <!-- Ô 3: Nhóm liên kết mạng xã hội (Facebook, Tiktok, Discord) -->
+            <div class="flex items-center gap-1.5 md:gap-2 border-l pl-3 md:pl-5 border-slate-200">
+                <a href="https://www.facebook.com/profile.php?id=61568473183500" target="_blank" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-300 hover:-translate-y-1" title="Facebook">
+                    <i class="fa-brands fa-facebook-f text-sm md:text-base"></i>
+                </a>
+                <a href="https://www.tiktok.com/@66dng.nguyn" target="_blank" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-black hover:scale-105 transition-all duration-300 hover:-translate-y-1" title="TikTok">
+                    <i class="fa-brands fa-tiktok text-xs md:text-sm"></i>
+                </a>
+                <a href="https://discord.gg" target="_blank" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all duration-300 hover:-translate-y-1" title="Discord (Duongggggowo)">
+                    <i class="fa-brands fa-discord text-sm md:text-base"></i>
+                </a>
             </div>
         </div>
     </nav>
 
-    <section class="hero">
-        <h1 id="hero-title">TRANG CHỦ</h1>
-        <p>Chào mừng bạn đến với trang web cá nhân của Nguyễn Thái Dương. Cuộn xuống để xem các dự án & liên kết trang web!</p>
-    </section>
+    <header class="relative min-h-[75vh] md:min-h-[80vh] flex flex-col justify-center items-center text-center px-4 pt-28 bg-gradient-to-b from-violet-50/50 via-white to-transparent overflow-hidden">
+        <div class="absolute inset-0 z-0 pointer-events-none opacity-40">
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-violet-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+            <div class="absolute top-1/3 right-1/4 w-82 h-82 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        </div>
 
-    <div class="container">
-        <h2 class="section-title">DANH SÁCH TRANG WEB</h2>
-        <div class="web-grid" id="webGrid">
-            <!-- Web card mẫu -->
-            <div class="web-card">
-                <button class="delete-btn" onclick="deleteCard(this)" title="Xóa thẻ này"><i class="fa-solid fa-trash"></i></button>
-                <div class="card-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80" alt="Preview">
+        <div class="z-10 max-w-4xl">
+            <!-- Chữ "TRANG CHỦ" to đùng bay lên khi lướt trang -->
+            <h1 id="hero-title" class="text-6xl md:text-9xl font-black tracking-tight bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-800 bg-clip-text text-transparent select-none pb-2">
+                TRANG CHỦ
+            </h1>
+            
+            <p id="hero-sub" class="mt-6 text-base md:text-xl text-slate-500 max-w-2xl mx-auto font-medium transition-all duration-300">
+                Chào mừng bạn đến với không gian sáng tạo của <span class="text-violet-600 font-bold">Nguyễn Thái Dương</span>. Khám phá các dự án độc đáo bên dưới!
+            </p>
+        </div>
+
+        <!-- Mũi tên chỉ dẫn cuộn xuống -->
+        <div class="absolute bottom-8 flex flex-col items-center gap-2 cursor-pointer text-slate-400 hover:text-violet-600 transition-colors" onclick="scrollToShowcase()">
+            <span class="text-xs font-bold tracking-widest uppercase">Cuộn xuống</span>
+            <i class="fa-solid fa-chevron-down animate-bounce text-lg"></i>
+        </div>
+    </header>
+
+    <main id="showcase-section" class="flex-grow max-w-7xl w-full mx-auto px-4 md:px-12 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+            <div>
+                <h2 class="text-2xl md:text-4xl font-extrabold text-slate-950 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-violet-600 rounded-full inline-block"></span>
+                    Danh sách dự án & liên kết
+                </h2>
+                <p class="text-slate-500 mt-2">Nơi tổng hợp các trang web được thiết kế và vận hành bởi Dương.</p>
+            </div>
+            
+            <span id="card-count" class="bg-violet-100 text-violet-700 px-4 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                Đang hiển thị 1 trang web
+            </span>
+        </div>
+
+        <!-- Grid chứa các thẻ card web (thiết kế theo mô phỏng của bạn) -->
+        <div id="web-card-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Thẻ mẫu được tạo tự động và tuân thủ bản vẽ mổ phỏng -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group hover:-translate-y-1">
+                <!-- Hộp phía trên chứa ảnh và đường link đè lên theo mô phỏng -->
+                <div class="relative h-64 bg-slate-100 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="Web Preview" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/800x450/4f46e5/ffffff?text=Webcuarduong'">
+                    
+                    <!-- Đường link web hiển thị trên cùng tấm ảnh -->
+                    <div class="absolute top-4 left-4 right-4 bg-white/95 backdrop-filter backdrop-blur-sm px-4 py-2.5 rounded-lg border border-slate-200/50 shadow-sm flex items-center justify-between">
+                        <span class="text-xs md:text-sm font-semibold text-violet-600 truncate mr-2">https://duongngoo2k11-sketch.github.io/webcuarduong/</span>
+                        <a href="https://duongngoo2k11-sketch.github.io/webcuarduong/" target="_blank" class="text-slate-500 hover:text-violet-600 transition-colors">
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <a href="https://duongngoo2k11-sketch.github.io/webcuarduong/" target="_blank" class="card-link">https://duongngoo2k11-sketch.github.io/webcuarduong/</a>
-                    <p class="card-desc">Website dự án cá nhân được lưu trữ trực tiếp trên GitHub Pages. Nơi chia sẻ các dự án lập trình và ý tưởng cá nhân.</p>
+                
+                <!-- Phần mô tả bên phải/bên dưới ảnh theo mô phỏng -->
+                <div class="p-6 flex flex-col flex-grow justify-between bg-white border-t border-slate-50">
+                    <div>
+                        <span class="text-xs font-bold text-violet-500 tracking-wider uppercase">DỰ ÁN CHÍNH</span>
+                        <h3 class="text-lg font-bold text-slate-900 mt-1 mb-3">Website Cá Nhân - webcuarduong</h3>
+                        <!-- Phần mô tả -->
+                        <p class="text-sm md:text-base text-slate-500 leading-relaxed">
+                            Đây là trang web chính thức đầu tiên được đưa lên GitHub Pages. Dự án lưu trữ các thông tin giới thiệu, tài nguyên và là nền móng để Dương phát triển các dự án tiếp theo.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+                        <span><i class="fa-regular fa-clock mr-1"></i> Đã cập nhật</span>
+                        <span class="font-semibold text-slate-600">Nguyễn Thái Dương</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <section class="thanks-section">
-        <h2>THANKS FOR VISITING! ❤️</h2>
-        <p style="color: var(--text-muted); margin-top: 8px;">Cảm ơn bạn đã ghé thăm trang web của mình!</p>
+    <section class="bg-gradient-to-r from-violet-600 to-indigo-700 py-16 text-center text-white px-4 relative overflow-hidden mt-12">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-5xl font-black tracking-wide">THANKSS FOR VISITING! ❤️</h2>
+            <p class="mt-4 text-violet-100 text-sm md:text-base font-medium max-w-xl mx-auto">
+                Sự ghé thăm của bạn là niềm vinh hạnh lớn cho mình. Hy vọng trang web đem lại trải nghiệm tốt nhất cho bạn!
+            </p>
+        </div>
     </section>
 
-    <footer>
-        <div class="footer-content">
-            <div>
-                <p><strong>Chủ sở hữu:</strong> Nguyễn Thái Dương</p>
-                <p><strong>SĐT:</strong> 0961940490</p>
-                <p><strong>Email:</strong> duongngoo2k11@gmail.com</p>
-                <p><strong>Thực hiện:</strong> Gemini AI & Nguyễn Thái Dương</p>
+    <footer class="bg-slate-950 text-slate-400 py-12 px-4 md:px-12 border-t border-slate-900 text-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <!-- Thông tin liên hệ và người thực hiện -->
+            <div class="flex flex-col gap-3 text-center md:text-left">
+                <p class="text-white font-semibold text-base mb-1">Thông Tin Trang Web</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+                    <p class="flex items-center justify-center md:justify-start gap-2.5">
+                        <i class="fa-solid fa-user text-violet-500 w-4"></i>
+                        <span>Chủ page: <strong class="text-slate-200">Nguyễn Thái Dương</strong></span>
+                    </p>
+                    <p class="flex items-center justify-center md:justify-start gap-2.5">
+                        <i class="fa-solid fa-phone text-violet-500 w-4"></i>
+                        <span>SĐT: <a href="tel:0961940490" class="hover:text-white transition-colors text-slate-200 font-semibold">0961940490</a></span>
+                    </p>
+                    <p class="flex items-center justify-center md:justify-start gap-2.5">
+                        <i class="fa-solid fa-envelope text-violet-500 w-4"></i>
+                        <span>Email: <a href="mailto:duongngoo2k11@gmail.com" class="hover:text-white transition-colors text-slate-200">duongngoo2k11@gmail.com</a></span>
+                    </p>
+                    <p class="flex items-center justify-center md:justify-start gap-2.5">
+                        <i class="fa-solid fa-code text-violet-500 w-4"></i>
+                        <span>Thực hiện: <strong class="text-slate-200">Gemini & Dương</strong></span>
+                    </p>
+                </div>
             </div>
-            <div class="admin-auth">
-                <input type="password" id="adminPass" placeholder="Nhập mật khẩu Admin...">
-                <button onclick="checkAdmin()">Xác nhận</button>
+
+            <!-- Chỗ nhập mật khẩu để kích hoạt tính năng sửa/thêm -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col gap-2.5 w-full max-w-xs">
+                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Chế độ Quản Trị Viên</span>
+                <div class="flex gap-2">
+                    <input type="password" id="adminPasswordInput" placeholder="Nhập mật khẩu..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-violet-500 flex-grow">
+                    <button onclick="authenticateAdmin()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition-all">
+                        Xác nhận
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-500">Mật khẩu thử nghiệm: <span class="text-slate-400 font-mono">123456</span></p>
             </div>
         </div>
     </footer>
 
-    <button class="add-btn-float" id="addBtn" onclick="openAddModal()">+</button>
+    <button id="floatingAddBtn" onclick="openModal('addWebModal')" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-full flex items-center justify-center shadow-xl hover:shadow-violet-300 hover:scale-110 active:scale-95 transition-all duration-200 z-40 hidden">
+        <i class="fa-solid fa-plus text-2xl"></i>
+    </button>
 
-    <div class="modal" id="reviewModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeReviewModal()">&times;</span>
-            <h3>Đánh giá & Phản hồi</h3>
-            <div class="star-rating" id="starRating">
-                <i class="fa-solid fa-star" data-value="1"></i>
-                <i class="fa-solid fa-star" data-value="2"></i>
-                <i class="fa-solid fa-star" data-value="3"></i>
-                <i class="fa-solid fa-star" data-value="4"></i>
-                <i class="fa-solid fa-star" data-value="5"></i>
+    <div id="toastContainer" class="fixed top-24 right-4 z-[9999] flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
+
+    <div id="reviewModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[999] hidden justify-center items-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            <!-- Header Modal -->
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-950 flex items-center gap-2">
+                    <i class="fa-solid fa-comment-dots text-violet-500"></i>
+                    Đánh giá & Phản hồi
+                </h3>
+                <button onclick="closeModal('reviewModal')" class="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fa-solid fa-times"></i>
+                </button>
             </div>
-            <textarea id="reviewText" rows="3" placeholder="Nhập cảm nhận của bạn..."></textarea>
-            <button class="btn-submit" onclick="submitReview()">Gửi đánh giá</button>
+            
+            <!-- Nội dung Modal -->
+            <div class="p-6 overflow-y-auto space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bấm chọn số sao của bạn</label>
+                    <div class="flex gap-2.5 text-2xl" id="starRatingSelector">
+                        <i class="fa-solid fa-star text-amber-400 cursor-pointer hover:scale-110 transition-transform" data-value="1"></i>
+                        <i class="fa-solid fa-star text-amber-400 cursor-pointer hover:scale-110 transition-transform" data-value="2"></i>
+                        <i class="fa-solid fa-star text-amber-400 cursor-pointer hover:scale-110 transition-transform" data-value="3"></i>
+                        <i class="fa-solid fa-star text-amber-400 cursor-pointer hover:scale-110 transition-transform" data-value="4"></i>
+                        <i class="fa-solid fa-star text-amber-400 cursor-pointer hover:scale-110 transition-transform" data-value="5"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="reviewComment" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ý kiến hoặc lời khuyên của bạn</label>
+                    <textarea id="reviewComment" rows="3" placeholder="Nhập cảm nhận của bạn tại đây..." class="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all"></textarea>
+                </div>
+
+                <button onclick="submitReview()" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-violet-200 transition-all hover:shadow-violet-300">
+                    Gửi phản hồi ngay
+                </button>
+
+                <!-- Danh sách các bài đánh giá trước đó -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-900 mb-3 flex items-center justify-between">
+                        <span>Đánh giá từ cộng đồng</span>
+                        <span id="review-count" class="text-xs font-normal text-slate-400">2 đánh giá</span>
+                    </h4>
+                    <div id="previousReviewsList" class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                        <!-- Sẽ tự động kết xuất bằng JavaScript -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="modal" id="addModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeAddModal()">&times;</span>
-            <h3>Thêm Trang Web Mới</h3>
-            <input type="text" id="webUrl" placeholder="Đường link trang web (https://...)">
-            <input type="text" id="webImg" placeholder="Link ảnh xem trước">
-            <textarea id="webDesc" rows="3" placeholder="Mô tả trang web..."></textarea>
-            <button class="btn-submit" onclick="addNewWeb()">Thêm Hoàn Tất</button>
+    <div id="addWebModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[999] hidden justify-center items-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 flex flex-col overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            <!-- Header Modal -->
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-950 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-violet-500"></i>
+                    Thêm trang web mới
+                </h3>
+                <button onclick="closeModal('addWebModal')" class="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Form nội dung -->
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="inputWebUrl" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Đường Link Trang Web</label>
+                    <input type="text" id="inputWebUrl" placeholder="https://example.com" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="inputWebImg" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Link Ảnh Mô Phỏng (Preview)</label>
+                    <input type="text" id="inputWebImg" placeholder="https://images.unsplash.com/..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all">
+                    <p class="text-[10px] text-slate-400 mt-1">Để trống nếu muốn sử dụng ảnh mặc định.</p>
+                </div>
+
+                <div>
+                    <label for="inputWebTitle" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tên trang web / Dự án</label>
+                    <input type="text" id="inputWebTitle" placeholder="Ví dụ: Trang giới thiệu bản thân" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="inputWebDesc" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Mô tả ngắn gọn</label>
+                    <textarea id="inputWebDesc" rows="3" placeholder="Nhập các thông tin giới thiệu dự án..." class="w-full border border-slate-200 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeModal('addWebModal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition-all">
+                        Hủy bỏ
+                    </button>
+                    <button onclick="submitNewWebCard()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-violet-200 transition-all hover:shadow-violet-300">
+                        Thêm hoàn tất
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        window.addEventListener('scroll', () => {
-            const heroTitle = document.getElementById('hero-title');
-            if (window.scrollY > 80) {
-                heroTitle.style.opacity = '0';
-                heroTitle.style.transform = 'translateY(-40px)';
+        // --- 1. HỆ THỐNG THÔNG BÁO TOAST THAY THẾ ALERT() ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg border text-sm font-semibold transition-all duration-300 transform translate-x-12 opacity-0 pointer-events-auto bg-white`;
+            
+            // Thiết lập màu sắc theo loại
+            let icon = '';
+            if (type === 'success') {
+                toast.classList.add('border-emerald-100', 'text-emerald-800');
+                icon = '<i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>';
+            } else if (type === 'error') {
+                toast.classList.add('border-rose-100', 'text-rose-800');
+                icon = '<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i>';
             } else {
-                heroTitle.style.opacity = '1';
-                heroTitle.style.transform = 'translateY(0)';
+                toast.classList.add('border-violet-100', 'text-violet-800');
+                icon = '<i class="fa-solid fa-circle-info text-violet-500 text-lg"></i>';
+            }
+
+            toast.innerHTML = `
+                ${icon}
+                <div class="flex-grow">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-times"></i></button>
+            `;
+
+            container.appendChild(toast);
+
+            // Hiển thị lên màn hình mượt mà
+            setTimeout(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            }, 10);
+
+            // Tự biến mất sau 4 giây
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // --- 2. HIỆU ỨNG CHỮ TRANG CHỦ BAY LÊN KHI LƯỚT WEB ---
+        window.addEventListener('scroll', () => {
+            const title = document.getElementById('hero-title');
+            const sub = document.getElementById('hero-sub');
+            const scrollPos = window.scrollY;
+
+            // Tính toán mức độ mờ và đẩy dịch chuyển tiêu đề
+            if (scrollPos < 400) {
+                const opacity = 1 - (scrollPos / 350);
+                const transformY = -(scrollPos * 0.4);
+                
+                title.style.opacity = Math.max(opacity, 0);
+                title.style.transform = `translateY(${transformY}px)`;
+                
+                sub.style.opacity = Math.max(opacity, 0);
+                sub.style.transform = `translateY(${transformY * 0.5}px)`;
+            } else {
+                title.style.opacity = 0;
+                sub.style.opacity = 0;
             }
         });
 
+        function scrollToShowcase() {
+            const section = document.getElementById('showcase-section');
+            const offset = 100; // Khoảng cách chừa lại
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = section.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+
+        // --- 3. ĐIỀU KHIỂN ĐÓNG MỞ MODALS ---
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Tạo hiệu ứng Scale In
+            setTimeout(() => {
+                const inner = modal.querySelector('.scale-95');
+                inner.classList.remove('scale-95', 'opacity-0');
+                inner.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const inner = modal.querySelector('.scale-100');
+            
+            if (inner) {
+                inner.classList.add('scale-95', 'opacity-0');
+                inner.classList.remove('scale-100', 'opacity-100');
+            }
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 250);
+        }
+
+        // Đóng modal khi bấm ra vùng trống bên ngoài
+        window.addEventListener('click', (e) => {
+            if (e.target.id === 'reviewModal') closeModal('reviewModal');
+            if (e.target.id === 'addWebModal') closeModal('addWebModal');
+        });
+
+        // --- 4. HỆ THỐNG ĐÁNH GIÁ (REVIEW SYSTEM) ---
         let selectedStars = 5;
-        const stars = document.querySelectorAll('#starRating i');
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
+        const ratingStars = document.querySelectorAll('#starRatingSelector i');
+
+        ratingStars.forEach(star => {
+            star.addEventListener('click', (e) => {
                 selectedStars = parseInt(star.getAttribute('data-value'));
-                stars.forEach((s, idx) => {
-                    if (idx < selectedStars) s.classList.add('active');
-                    else s.classList.remove('active');
-                });
+                updateStarSelector(selectedStars);
             });
         });
 
-        function openReviewModal() { document.getElementById('reviewModal').style.display = 'flex'; }
-        function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
+        function updateStarSelector(value) {
+            ratingStars.forEach((star, index) => {
+                if (index < value) {
+                    star.className = "fa-solid fa-star text-amber-400 cursor-pointer hover:scale-110 transition-transform";
+                } else {
+                    star.className = "fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform";
+                }
+            });
+        }
+
+        // Quản lý lưu trữ đánh giá trong LocalStorage
+        let reviewsData = JSON.parse(localStorage.getItem('reviews')) || [
+            { id: 1, name: "Khách ẩn danh", stars: 5, comment: "Trang web thiết kế hiện đại, mượt mà và trực quan quá Dương ơi! 5 sao nhé!" },
+            { id: 2, name: "Trần Minh", stars: 4, comment: "Hiệu ứng chữ cuốn rất sang trọng. Chúc bạn thành công với những dự án mới!" }
+        ];
+
+        function renderReviews() {
+            const container = document.getElementById('previousReviewsList');
+            const countLabel = document.getElementById('review-count');
+            container.innerHTML = '';
+            
+            countLabel.textContent = `${reviewsData.length} đánh giá`;
+
+            if (reviewsData.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>`;
+                return;
+            }
+
+            reviewsData.forEach(item => {
+                let starMarkup = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= item.stars) {
+                        starMarkup += '<i class="fa-solid fa-star text-amber-400 text-xs"></i>';
+                    } else {
+                        starMarkup += '<i class="fa-regular fa-star text-slate-300 text-xs"></i>';
+                    }
+                }
+
+                const div = document.createElement('div');
+                div.className = 'p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-700">${item.name}</span>
+                        <div class="flex gap-0.5">${starMarkup}</div>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed">${item.comment}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
         function submitReview() {
-            alert('Cảm ơn bạn đã gửi đánh giá!');
-            closeReviewModal();
+            const commentInput = document.getElementById('reviewComment');
+            const comment = commentInput.value.trim();
+
+            if (!comment) {
+                showToast("Bạn vui lòng viết vài từ nhận xét nhé!", "error");
+                return;
+            }
+
+            const newReview = {
+                id: Date.now(),
+                name: "Khách ẩn danh",
+                stars: selectedStars,
+                comment: comment
+            };
+
+            reviewsData.unshift(newReview);
+            localStorage.setItem('reviews', JSON.stringify(reviewsData));
+            
+            // Reset form
+            commentInput.value = '';
+            updateStarSelector(5);
+            selectedStars = 5;
+
+            renderReviews();
+            showToast("Gửi đánh giá thành công! Cảm ơn đóng góp của bạn.");
         }
 
-        function checkAdmin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === '123456') {
-                alert('Mật khẩu đúng! Đã hiện nút (+) thêm web và nút (🗑️) xóa web.');
-                document.getElementById('addBtn').style.display = 'block';
-                document.body.classList.add('admin-mode');
+        // --- 5. HỆ THỐNG CHẾ ĐỘ QUẢN TRỊ (ADMIN MODE) ---
+        let isAdmin = false;
+
+        function authenticateAdmin() {
+            const pwdInput = document.getElementById('adminPasswordInput');
+            const password = pwdInput.value;
+
+            // Mật khẩu chính thức là 123456
+            if (password === '123456') {
+                isAdmin = true;
+                showToast("Mở khóa thành công! Bạn hiện là Quản Trị Viên.");
+                document.getElementById('floatingAddBtn').classList.remove('hidden');
+                pwdInput.value = '';
+                
+                // SỬA LỖI: Gọi lại hàm vẽ thẻ để nút thùng rác xuất hiện ngay lập tức!
+                renderWebCards();
             } else {
-                alert('Mật khẩu không đúng!');
+                showToast("Mật khẩu không hợp lệ! Vui lòng thử lại.", "error");
             }
         }
 
-        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+        // Dữ liệu danh sách dự án
+        let webCardsData = JSON.parse(localStorage.getItem('webCards')) || [
+            {
+                id: 1,
+                url: 'https://duongngoo2k11-sketch.github.io/webcuarduong/',
+                img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+                title: 'Website Cá Nhân - webcuarduong',
+                desc: 'Đây là trang web chính thức đầu tiên được đưa lên GitHub Pages. Dự án lưu trữ các thông tin giới thiệu, tài nguyên và là nền móng để Dương phát triển các dự án tiếp theo.'
+            }
+        ];
 
-        function addNewWeb() {
-            const url = document.getElementById('webUrl').value;
-            const img = document.getElementById('webImg').value || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80';
-            const desc = document.getElementById('webDesc').value;
+        function renderWebCards() {
+            const grid = document.getElementById('web-card-grid');
+            const countLabel = document.getElementById('card-count');
+            grid.innerHTML = '';
 
-            if(!url || !desc) { alert('Vui lòng nhập đủ thông tin!'); return; }
+            countLabel.textContent = `Đang hiển thị ${webCardsData.length} trang web`;
 
-            const grid = document.getElementById('webGrid');
-            const card = document.createElement('div');
-            card.className = 'web-card';
-            card.innerHTML = `
-                <button class="delete-btn" onclick="deleteCard(this)" title="Xóa thẻ này"><i class="fa-solid fa-trash"></i></button>
-                <div class="card-img-wrapper"><img src="${img}"></div>
-                <div class="card-content">
-                    <a href="${url}" target="_blank" class="card-link">${url}</a>
-                    <p class="card-desc">${desc}</p>
-                </div>
-            `;
-            grid.appendChild(card);
-            closeAddModal();
+            webCardsData.forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'bg-white rounded-2xl border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group hover:-translate-y-1 relative';
+                
+                // Nút xóa được thiết kế màu đỏ rực rỡ, viền trắng 2px nổi bật hẳn trên nền ảnh
+                const deleteBtnHtml = isAdmin ? `
+                    <button onclick="deleteWebCard(${card.id})" class="absolute top-16 right-4 w-11 h-11 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center transition-all shadow-lg border-2 border-white z-20 animate-pulse" title="Gỡ thẻ này">
+                        <i class="fa-solid fa-trash text-base"></i>
+                    </button>
+                ` : '';
+
+                cardDiv.innerHTML = `
+                    <div class="relative h-64 bg-slate-100 overflow-hidden">
+                        <img src="${card.img}" alt="${card.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/800x450/4f46e5/ffffff?text=Webcuarduong'">
+                        
+                        <div class="absolute top-4 left-4 right-4 bg-white/95 backdrop-filter backdrop-blur-sm px-4 py-2.5 rounded-lg border border-slate-200/50 shadow-sm flex items-center justify-between z-10">
+                            <span class="text-xs md:text-sm font-semibold text-violet-600 truncate mr-2">${card.url}</span>
+                            <a href="${card.url}" target="_blank" class="text-slate-500 hover:text-violet-600 transition-colors">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                    ${deleteBtnHtml}
+                    <div class="p-6 flex flex-col flex-grow justify-between bg-white border-t border-slate-50">
+                        <div>
+                            <span class="text-xs font-bold text-violet-500 tracking-wider uppercase">DỰ ÁN PHÁT TRIỂN</span>
+                            <h3 class="text-lg font-bold text-slate-900 mt-1 mb-3">${card.title}</h3>
+                            <p class="text-sm md:text-base text-slate-500 leading-relaxed">${card.desc}</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+                            <span><i class="fa-regular fa-clock mr-1"></i> Tự động hiển thị</span>
+                            <span class="font-semibold text-slate-600">Nguyễn Thái Dương</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cardDiv);
+            });
         }
 
-        function deleteCard(btn) {
-            if (confirm('Bạn có chắc chắn muốn xóa trang web này?')) {
-                btn.closest('.web-card').remove();
+        function submitNewWebCard() {
+            const urlInput = document.getElementById('inputWebUrl');
+            const imgInput = document.getElementById('inputWebImg');
+            const titleInput = document.getElementById('inputWebTitle');
+            const descInput = document.getElementById('inputWebDesc');
+
+            let url = urlInput.value.trim();
+            let img = imgInput.value.trim();
+            const title = titleInput.value.trim();
+            const desc = descInput.value.trim();
+
+            if (!url || !title || !desc) {
+                showToast("Vui lòng điền đầy đủ các thông tin bắt buộc!", "error");
+                return;
             }
+
+            // Gắn giao thức https nếu khách chưa nhập
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+
+            if (!img) {
+                img = 'https://placehold.co/800x450/4f46e5/ffffff?text=Preview+Image';
+            }
+
+            const newCard = {
+                id: Date.now(),
+                url: url,
+                img: img,
+                title: title,
+                desc: desc
+            };
+
+            webCardsData.push(newCard);
+            localStorage.setItem('webCards', JSON.stringify(webCardsData));
+            
+            // Xóa form trống
+            urlInput.value = '';
+            imgInput.value = '';
+            titleInput.value = '';
+            descInput.value = '';
+
+            closeModal('addWebModal');
+            renderWebCards();
+            showToast("Trang web của bạn đã được thêm thành công!");
+        }
+
+        function deleteWebCard(id) {
+            webCardsData = webCardsData.filter(card => card.id !== id);
+            localStorage.setItem('webCards', JSON.stringify(webCardsData));
+            renderWebCards();
+            showToast("Đã gỡ dự án khỏi danh mục!");
+        }
+
+        // --- 6. KHỞI CHẠY TRANG WEB ---
+        window.onload = function() {
+            renderReviews();
+            renderWebCards();
         }
     </script>
 </body>
