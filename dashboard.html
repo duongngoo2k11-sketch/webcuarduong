@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Góc Làm Việc Siêu Năng Suất</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 20px; display: flex; justify-content: center; }
+        .container { max-width: 900px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        
+        .card { background: var(--card); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        h2 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--accent); }
+        
+        /* Pomodoro Timer */
+        .timer-display { font-size: 4rem; font-weight: 800; text-align: center; margin: 20px 0; font-family: monospace; letter-spacing: 2px; }
+        .timer-btn-group { display: flex; gap: 10px; justify-content: center; }
+        button { background: var(--accent); color: #000; border: none; padding: 12px 24px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button.secondary { background: rgba(255,255,255,0.1); color: var(--text); }
+        
+        /* Todo List */
+        .todo-input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; color: #fff; outline: none; }
+        input[type="text"]:focus { border-color: var(--accent); }
+        ul { list-style: none; max-height: 300px; overflow-y: auto; }
+        li { background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        li.completed span { text-decoration: line-through; opacity: 0.5; }
+        .actions { display: flex; gap: 8px; }
+        .icon-btn { background: none; color: rgba(255,255,255,0.5); padding: 5px; cursor: pointer; }
+        .icon-btn:hover { color: var(--text); transform: none; }
+        .icon-btn.delete:hover { color: var(--danger); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Pomodoro Section -->
+        <div class="card">
+            <h2><i class="fa-solid fa-stopwatch"></i> Đồng Hồ Pomodoro</h2>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="timer-btn-group">
+                <button id="start-btn" onclick="toggleTimer()">Bắt đầu</button>
+                <button class="secondary" onclick="resetTimer()">Đặt lại</button>
+                <button class="secondary" onclick="setMode(5)">Nghỉ 5p</button>
+            </div>
+        </div>
+
+        <!-- Todo List Section -->
+        <div class="card">
+            <h2><i class="fa-solid fa-list-check"></i> Nhiệm Vụ Hôm Nay</h2>
+            <div class="todo-input-group">
+                <input type="text" id="todo-input" placeholder="Thêm công việc mới..." onkeypress="handleKeyPress(event)">
+                <button onclick="addTodo()"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <ul id="todo-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // --- POMODORO SYSTEM ---
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        let isRunning = false;
+
+        function updateDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerId);
+                document.getElementById('start-btn').innerText = 'Tiếp tục';
+            } else {
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(timerId);
+                        alert('Hết giờ làm việc! Hãy nghỉ ngơi thôi.');
+                        resetTimer();
+                    }
+                }, 1000);
+                document.getElementById('start-btn').innerText = 'Tạm dừng';
+            }
+            isRunning = !isRunning;
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            isRunning = false;
+            timeLeft = 25 * 60;
+            document.getElementById('start-btn').innerText = 'Bắt đầu';
+            updateDisplay();
+        }
+
+        function setMode(minutes) {
+            clearInterval(timerId);
+            isRunning = false;
+            timeLeft = minutes * 60;
+            document.getElementById('start-btn').innerText = 'Bắt đầu';
+            updateDisplay();
+        }
+
+        // --- TODO LIST SYSTEM WITH LOCALSTORAGE ---
+        let todos = JSON.parse(localStorage.getItem('my_todos')) || [];
+
+        function saveTodos() {
+            localStorage.setItem('my_todos', JSON.stringify(todos));
+            renderTodos();
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            const text = input.value.trim();
+            if (text) {
+                todos.push({ text, completed: false, id: Date.now() });
+                input.value = '';
+                saveTodos();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') addTodo();
+        }
+
+        function toggleTodo(id) {
+            todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveTodos();
+        }
+
+        function deleteTodo(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveTodos();
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            todos.forEach(t => {
+                const li = document.createElement('li');
+                if (t.completed) li.classList.add('completed');
+                li.innerHTML = `
+                    <span onclick="toggleTodo(${t.id})" style="cursor:pointer; flex:1;">${t.text}</span>
+                    <div class="actions">
+                        <button class="icon-btn" onclick="toggleTodo(${t.id})"><i class="fa-solid fa-check"></i></button>
+                        <button class="icon-btn delete" onclick="deleteTodo(${t.id})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // Init
+        renderTodos();
+    </script>
+</body>
+</html>

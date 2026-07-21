@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vũ Trụ Hạt Tương Tác</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #050508; font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        .ui-panel {
+            position: absolute; top: 20px; left: 20px; z-index: 10;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 16px;
+            color: #fff; width: 280px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        h2 { font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; color: #00f2fe; }
+        .control-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.8rem; margin-bottom: 5px; opacity: 0.8; }
+        input[type="range"] { width: 100%; accent-color: #00f2fe; cursor: pointer; }
+        .stats { font-size: 0.75rem; opacity: 0.6; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); pt: 8px; }
+    </style>
+</head>
+<body>
+    <div class="ui-panel">
+        <h2>Particle Engine</h2>
+        <div class="control-group">
+            <label>Số lượng hạt: <span id="count-val">300</span></label>
+            <input type="range" id="particle-count" min="50" max="800" value="300">
+        </div>
+        <div class="control-group">
+            <label>Bán kính kết nối</label>
+            <input type="range" id="connect-dist" min="50" max="200" value="120">
+        </div>
+        <div class="stats">
+            <p>Rê chuột: Hút hạt | Click: Bùng nổ</p>
+            <p>FPS: <span id="fps">60</span></p>
+        </div>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            init();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        window.addEventListener('click', (e) => {
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle(e.x, e.y, true));
+            }
+        });
+
+        class Particle {
+            constructor(x, y, isExplosion = false) {
+                this.x = x || Math.random() * width;
+                this.y = y || Math.random() * height;
+                this.size = Math.random() * 3 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.vx = (Math.random() - 0.5) * (isExplosion ? 8 : 2);
+                this.vy = (Math.random() - 0.5) * (isExplosion ? 8 : 2);
+                this.color = `hsl(${Math.random() * 60 + 180}, 100%, 70%)`;
+                this.life = isExplosion ? 100 : Infinity;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                if (this.life !== Infinity) this.life--;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                // Tương tác chuột
+                if (mouse.x && mouse.y) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        let directionX = dx / distance;
+                        let directionY = dy / distance;
+                        this.x += directionX * force * 5;
+                        this.y += directionY * force * 5;
+                    }
+                }
+            }
+        }
+
+        function init() {
+            particles = [];
+            let count = document.getElementById('particle-count').value;
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connect() {
+            let maxDist = document.getElementById('connect-dist').value;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDist) {
+                        let opacity = 1 - (dist / maxDist);
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${opacity * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        let lastTime = performance.now();
+        let frameCount = 0;
+
+        function animate(currentTime) {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            connect();
+
+            // Tính FPS
+            frameCount++;
+            if (currentTime - lastTime >= 1000) {
+                document.getElementById('fps').innerText = frameCount;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        document.getElementById('particle-count').addEventListener('input', (e) => {
+            document.getElementById('count-val').innerText = e.target.value;
+            init();
+        });
+
+        init();
+        animate(performance.now());
+    </script>
+</body>
+</html>
