@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Audio Player</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: monospace; }
+        body { background: #111; color: #eee; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px; }
+        
+        .input-container { width: 100%; max-width: 500px; margin-top: auto; margin-bottom: auto; text-align: center; }
+        input[type="text"] { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; outline: none; margin-bottom: 12px; font-size: 0.9rem; }
+        button.load-btn { padding: 10px 20px; background: #00ffcc; color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 6px; font-size: 0.9rem; }
+        button.load-btn:hover { background: #fff; }
+
+        #player-wrapper { display: none; }
+
+        .bottom-bar { width: 100%; max-width: 600px; border-top: 1px solid #333; padding-top: 15px; text-align: center; }
+        .song-title { font-size: 0.9rem; color: #00ffcc; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .controls { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .controls button { background: #222; color: #fff; border: 1px solid #444; padding: 8px 14px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; }
+        .controls button:hover { background: #333; }
+        .controls button.skip-ad { border-color: #ffaa00; color: #ffaa00; }
+    </style>
+</head>
+<body>
+
+    <div class="input-container">
+        <input type="text" id="yt-link" placeholder="Dán URL YouTube vào đây...">
+        <button class="load-btn" onclick="loadVideo()">Phát Nhạc</button>
+    </div>
+
+    <div id="player-wrapper">
+        <div id="youtube-player"></div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="song-title" id="track-name">Chưa có bài hát nào...</div>
+        <div class="controls">
+            <button onclick="prevTrack()">⏮ Lùi bài</button>
+            <button id="play-btn" onclick="togglePlay()">▶ Phát / Tạm dừng</button>
+            <button onclick="nextTrack()">⏭ Bài tiếp</button>
+            <button class="skip-ad" onclick="skipAd()">⏩ Bỏ qua QC</button>
+        </div>
+    </div>
+
+    <script>
+        let player;
+        let isPlaying = false;
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '1',
+                width: '1',
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function loadVideo() {
+            const link = document.getElementById('yt-link').value;
+            const videoId = extractVideoId(link);
+
+            if (videoId && player) {
+                player.loadVideoById(videoId);
+                isPlaying = true;
+            } else {
+                alert("Link YouTube không hợp lệ!");
+            }
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                const data = player.getVideoData();
+                document.getElementById('track-name').innerText = "🎵 Đang phát: " + (data.title || "YouTube Video");
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                isPlaying = false;
+            }
+        }
+
+        function togglePlay() {
+            if (!player) return;
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function skipAd() {
+            if (!player) return;
+            const curr = player.getCurrentTime();
+            player.seekTo(curr + 15, true);
+        }
+
+        function nextTrack() {
+            if (player && player.nextVideo) player.nextVideo();
+        }
+
+        function prevTrack() {
+            if (player && player.previousVideo) player.previousVideo();
+        }
+    </script>
+</body>
+</html>
