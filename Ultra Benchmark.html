@@ -3,148 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SÁT THỦ PHẦN CỨNG - BẢN DIỆT MÁY</title>
+    <title>GOD-TIER BENCHMARK (FOR RTX 5090 & i9)</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: monospace; }
-        body { background: #050505; color: #ff3333; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .card { background: #111; border: 2px solid #ff3333; border-radius: 12px; padding: 25px; max-width: 600px; width: 100%; box-shadow: 0 0 30px rgba(255,51,51,0.3); text-align: center; }
-        h1 { font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 0 10px #ff3333; }
-        p { color: #888; font-size: 0.85rem; margin-bottom: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        body { background: #030303; color: #00ffcc; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: #0a0a0f; border: 2px solid #00ffcc; border-radius: 16px; padding: 30px; max-width: 700px; width: 100%; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); text-align: center; }
+        h1 { font-size: 2rem; color: #fff; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; }
+        p.subtitle { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
         
-        .score-box { background: #000; border: 1px dashed #ff3333; padding: 15px; margin-bottom: 20px; }
-        .score-num { font-size: 3.5rem; font-weight: bold; color: #fff; }
+        .score-box { background: #000; border: 1px solid #00ffcc; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .score-num { font-size: 4.5rem; font-weight: bold; color: #00ffcc; text-shadow: 0 0 25px #00ffcc; }
+        .rank { font-size: 1.1rem; color: #fff; margin-top: 5px; font-weight: bold; }
+
+        canvas { width: 100%; height: 250px; background: #000; border: 1px solid #222; border-radius: 8px; margin-bottom: 20px; display: block; }
         
-        canvas { width: 100%; height: 200px; background: #000; border: 1px solid #333; margin-bottom: 15px; display: block; }
-        
-        .status-box { text-align: left; font-size: 0.85rem; color: #aaa; margin-bottom: 20px; line-height: 1.6; }
-        .status-box div { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .metrics { text-align: left; font-size: 0.85rem; margin-bottom: 25px; line-height: 1.8; color: #aaa; }
+        .metrics div { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 4px 0; }
         .val { color: #fff; font-weight: bold; }
 
-        button { background: #ff3333; color: #000; border: none; padding: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
-        button:hover { background: #fff; box-shadow: 0 0 15px #fff; }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+        button { background: #00ffcc; color: #000; border: none; padding: 16px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; border-radius: 8px; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
+        button:hover { background: #fff; box-shadow: 0 0 25px #fff; }
+        button:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>☠️ APOCALYPSE TEST</h1>
-        <p>Cảnh báo: Bản test này sẽ làm ĐỨNG HÌNH trình duyệt vài giây!</p>
+        <h1>⚡ GOD-TIER BENCHMARK</h1>
+        <p class="subtitle">Thử thách hủy diệt dành riêng cho i9 Next-Gen & RTX 5090 (128GB RAM)</p>
 
         <div class="score-box">
             <div class="score-num" id="total-score">0</div>
-            <div id="rank-text" style="color: #ff3333; margin-top: 5px;">Chờ kích hoạt...</div>
+            <div class="rank" id="rank-text">SẴN SÀNG HỦY DIỆT</div>
         </div>
 
-        <canvas id="canvas" width="800" height="400"></canvas>
+        <canvas id="gl-canvas"></canvas>
 
-        <div class="status-box">
-            <div>🔥 Math Matrix (CPU Single Core): <span class="val" id="cpu-single">0 ms</span></div>
-            <div>💣 Multi-Core Blast (CPU All Threads): <span class="val" id="cpu-multi">0 ms</span></div>
-            <div>🌀 Raytracing 3D Pure JS (GPU/CPU): <span class="val" id="gpu-val">0 FPS</span></div>
-            <div>💥 RAM Bombardment (Alloc 3GB): <span class="val" id="ram-val">0 MB/s</span></div>
+        <div class="metrics">
+            <div>🚀 Multi-Core Matrix Blast (Max Threads): <span class="val" id="m-cpu">Chưa test</span></div>
+            <div>🌋 WebGL 2.0 Native Shader (50,000 Particles): <span class="val" id="m-gpu">Chưa test</span></div>
+            <div>💥 RAM & VRAM Stress Test (Massive Allocation): <span class="val" id="m-ram">Chưa test</span></div>
         </div>
 
-        <button id="btn" onclick="startNuke()">ÉP XUNG & VẮT KIỆT TỰ ĐỘNG</button>
+        <button id="btn" onclick="startGodBenchmark()">BẮT ĐẦU VẮT KIỆT RTX 5090</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const btn = document.getElementById('btn');
+        const canvas = document.getElementById('gl-canvas');
+        const gl = canvas.getContext('webgl2');
 
         function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-        async function startNuke() {
+        async function startGodBenchmark() {
+            const btn = document.getElementById('btn');
             btn.disabled = true;
-            btn.innerText = "ĐANG ÉP PHẦN CỨNG (SẼ LAG)...";
-            document.getElementById('rank-text').innerText = "Đang hành hạ máy...";
+            btn.innerText = "ĐANG ÉP 100% RTX 5090 & i9...";
+            document.getElementById('rank-text').innerText = "Đang chạy bài test Cực Đại...";
 
             await sleep(200);
 
-            // 1. SINGLE CORE HEAVY MATH (Chạy trực tiếp Main Thread làm lag màn hình)
-            const t0 = performance.now();
-            let junk = 0;
-            // Tính toán 80 triệu phép tính Lượng giác & Căn bậc hai
-            for (let i = 0; i < 80000000; i++) {
-                junk += Math.sin(i) * Math.cos(i) * Math.sqrt(i);
-            }
-            const singleTime = Math.round(performance.now() - t0);
-            document.getElementById('cpu-single').innerText = singleTime + " ms (Thấp là tốt)";
+            // 1. ÉP MULTI-THREAD CPU (CHẠY TOÀN BỘ LUỒNG CỦA i9)
+            const cpuScore = await testGodCPU();
+            document.getElementById('m-cpu').innerText = `${cpuScore.toLocaleString()} pts`;
 
             await sleep(100);
 
-            // 2. RAM BOMB (Ép cấp phát 3GB dữ liệu cực nhanh)
-            const r0 = performance.now();
-            let ramStorage = [];
-            try {
-                for(let i = 0; i < 300; i++) {
-                    // Mới mỗi mảng 10MB -> Tổng ~3GB
-                    let arr = new Float64Array(1250000);
-                    for(let j=0; j<arr.length; j+=50) arr[j] = Math.random();
-                    ramStorage.push(arr);
-                }
-            } catch(e){}
-            const ramTime = Math.round(performance.now() - r0);
-            ramStorage = null; // Xóa
-            document.getElementById('ram-val').innerText = ramTime + " ms";
+            // 2. ÉP RAM & BĂNG THÔNG DỮ LIỆU
+            const ramScore = testGodRAM();
+            document.getElementById('m-ram').innerText = `${ramScore.toLocaleString()} pts`;
 
             await sleep(100);
 
-            // 3. RAYTRACING 3D PURE JS (Bắt vẽ từng Pixel bằng toán 3D, không dùng thư viện)
-            let frames = 0;
-            const g0 = performance.now();
-            const imgData = ctx.createImageData(800, 400);
-            
-            // Vẽ 10 khung hình Raymarching toán học nặng tàn bạo
-            for(let frame = 0; frame < 15; frame++) {
-                for (let x = 0; x < 800; x+=2) {
-                    for (let y = 0; y < 400; y+=2) {
-                        let uvX = (x / 800) * 2 - 1;
-                        let uvY = (y / 400) * 2 - 1;
-                        
-                        // Thuật toán dựng khối cầu 3D bằng Math thuần
-                        let dist = Math.sqrt(uvX*uvX + uvY*uvY);
-                        let color = 0;
-                        for(let k=0; k<150; k++) { // 150 vòng lặp cho MỖI PIXEL
-                            color += Math.sin(dist * 20.0 - frame * 0.5 + k);
-                        }
-                        
-                        let idx = (y * 800 + x) * 4;
-                        imgData.data[idx] = Math.abs(color) % 255;     // R
-                        imgData.data[idx+1] = (x + frame * 10) % 255;  // G
-                        imgData.data[idx+2] = (y + frame * 10) % 255;  // B
-                        imgData.data[idx+3] = 255;                     // Alpha
-                    }
-                }
-                ctx.putImageData(imgData, 0, 0);
-                frames++;
-                await sleep(10);
-            }
-            const gpuTime = Math.round(performance.now() - g0);
-            const fps = ((frames / gpuTime) * 1000).toFixed(1);
-            document.getElementById('gpu-val').innerText = `${fps} FPS (${gpuTime}ms)`;
+            // 3. ÉP GPU RTX 5090 (VẼ 50,000 VẬT THỂ NATIVE SHADER 3D)
+            const gpuScore = await testGodGPU();
+            document.getElementById('m-gpu').innerText = `${gpuScore.toLocaleString()} pts`;
 
-            // TÍNH ĐIỂM SỐ CHUẨN
-            // Thời gian thực thi càng NHỎ -> Máy càng MẠNH -> Điểm càng CAO
-            let score = Math.round(
-                (10000000 / singleTime) * 1.5 + 
-                (5000000 / ramTime) * 0.5 + 
-                (fps * 2000)
-            );
+            // TỔNG ĐIỂM DÀNH CHO CẤU HÌNH KHỦNG
+            const total = Math.round(cpuScore * 0.35 + gpuScore * 0.45 + ramScore * 0.20);
+            document.getElementById('total-score').innerText = total.toLocaleString();
 
-            document.getElementById('total-score').innerText = score;
-            
-            if (score > 18000) {
-                document.getElementById('rank-text').innerText = "🥇 QUÁI VẬT KHÔNG BIẾT LAG (i7/i9/Ryzen9 + Card Khủng)";
-            } else if (score > 9000) {
-                document.getElementById('rank-text').innerText = "🥈 TỐT: Chạy mượt nhưng có khựng nhẹ";
+            if (total > 80000) {
+                document.getElementById('rank-text').innerText = "👑 QUÁI VẬT VŨ TRỤ: RTX 5090 + i9 ĐÃ KHỦNG BỐ THÀNH CÔNG!";
+            } else if (total > 40000) {
+                document.getElementById('rank-text').innerText = "🔥 SIÊU MÁY TÍNH: Rất mạnh (Dòng RTX 4090 / i9)";
             } else {
-                document.getElementById('rank-text').innerText = "🐢 YẾU / MÁY CỔ: Khựng cứng ngắc!";
+                document.getElementById('rank-text').innerText = "🐢 BỊ NGHẼN BÌNH XĂNG: Không gánh nổi bài test này!";
             }
 
             btn.disabled = false;
             btn.innerText = "TEST LẠI LẦN NỮA";
+        }
+
+        // --- 1. MULTI-CORE WORKER THÙẦN ---
+        function testGodCPU() {
+            return new Promise(resolve => {
+                const threads = navigator.hardwareConcurrency || 16;
+                let done = 0;
+                let totalOps = 0;
+                const start = performance.now();
+
+                const workerCode = `
+                    self.onmessage = function() {
+                        let ops = 0;
+                        for (let i = 0; i < 25000000; i++) {
+                            ops += Math.atan(i) * Math.tan(i) + Math.sqrt(i);
+                        }
+                        self.postMessage(ops);
+                    }
+                `;
+                const blob = new Blob([workerCode], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+
+                for (let i = 0; i < threads; i++) {
+                    const w = new Worker(url);
+                    w.postMessage('start');
+                    w.onmessage = () => {
+                        done++;
+                        if (done === threads) {
+                            const time = performance.now() - start;
+                            URL.revokeObjectURL(url);
+                            resolve(Math.round((threads * 500000000) / time));
+                        }
+                        w.terminate();
+                    };
+                }
+            });
+        }
+
+        // --- 2. RAM BĂNG THÔNG CỰC ĐẠI ---
+        function testGodRAM() {
+            const start = performance.now();
+            let chunks = [];
+            try {
+                // Ép ghi 6GB dữ liệu liên tục vào RAM
+                for (let i = 0; i < 600; i++) {
+                    let a = new Float64Array(1250000);
+                    for (let j = 0; j < a.length; j += 10) a[j] = Math.random();
+                    chunks.push(a);
+                }
+            } catch (e) {}
+            const time = performance.now() - start;
+            chunks = null;
+            return Math.round(15000000 / time);
+        }
+
+        // --- 3. WEBGL 2.0 NATIVE SHADER CHO RTX 5090 ---
+        function testGodGPU() {
+            return new Promise(resolve => {
+                if (!gl) { resolve(1000); return; }
+
+                canvas.width = 1000;
+                canvas.height = 500;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+
+                // Shader tính toán khối hạt khổng lồ
+                const vs = `#version 300 es
+                    in vec3 aPos;
+                    uniform float uTime;
+                    void main() {
+                        vec3 p = aPos;
+                        p.x += sin(uTime + aPos.y * 10.0) * 0.5;
+                        p.y += cos(uTime + aPos.x * 10.0) * 0.5;
+                        gl_Position = vec4(p, 1.0);
+                        gl_PointSize = 3.0;
+                    }
+                `;
+                const fs = `#version 300 es
+                    precision highp float;
+                    out vec4 fragColor;
+                    uniform float uTime;
+                    void main() {
+                        fragColor = vec4(abs(sin(uTime)), 0.8, 1.0, 1.0);
+                    }
+                `;
+
+                function createShader(gl, type, src) {
+                    const s = gl.createShader(type);
+                    gl.shaderSource(s, src);
+                    gl.compileShader(s);
+                    return s;
+                }
+
+                const program = gl.createProgram();
+                gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vs));
+                gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fs));
+                gl.linkProgram(program);
+                gl.useProgram(program);
+
+                // Tạo 50,000 điểm 3D
+                const count = 50000;
+                const positions = new Float32Array(count * 3);
+                for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 2;
+
+                const buf = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+                const aPos = gl.getAttribLocation(program, 'aPos');
+                gl.enableVertexAttribArray(aPos);
+                gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+
+                const uTime = gl.getUniformLocation(program, 'uTime');
+
+                let frames = 0;
+                const start = performance.now();
+
+                function render() {
+                    const elapsed = performance.now() - start;
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.uniform1f(uTime, elapsed * 0.005);
+                    gl.drawArrays(gl.POINTS, 0, count);
+                    frames++;
+
+                    if (elapsed < 3000) {
+                        requestAnimationFrame(render);
+                    } else {
+                        const fps = (frames * 1000) / 3000;
+                        resolve(Math.round(fps * 800));
+                    }
+                }
+                render();
+            });
         }
     </script>
 </body>
