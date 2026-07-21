@@ -3,87 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Góc Làm Việc Siêu Năng Suất</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #38bdf8;
-            --text: #f8fafc;
-            --danger: #ef4444;
-            --success: #22c55e;
+    <title>Góc Làm Việc Siêu Năng Suất - Pomodoro & ToDo</title>
+    <!-- Tailwind CSS và Font Awesome Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 20px; display: flex; justify-content: center; }
-        .container { max-width: 900px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
-        
-        .card { background: var(--card); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        h2 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--accent); }
-        
-        /* Pomodoro Timer */
-        .timer-display { font-size: 4rem; font-weight: 800; text-align: center; margin: 20px 0; font-family: monospace; letter-spacing: 2px; }
-        .timer-btn-group { display: flex; gap: 10px; justify-content: center; }
-        button { background: var(--accent); color: #000; border: none; padding: 12px 24px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.2s; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        button.secondary { background: rgba(255,255,255,0.1); color: var(--text); }
-        
-        /* Todo List */
-        .todo-input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        input[type="text"] { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; color: #fff; outline: none; }
-        input[type="text"]:focus { border-color: var(--accent); }
-        ul { list-style: none; max-height: 300px; overflow-y: auto; }
-        li { background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
-        li.completed span { text-decoration: line-through; opacity: 0.5; }
-        .actions { display: flex; gap: 8px; }
-        .icon-btn { background: none; color: rgba(255,255,255,0.5); padding: 5px; cursor: pointer; }
-        .icon-btn:hover { color: var(--text); transform: none; }
-        .icon-btn.delete:hover { color: var(--danger); }
+    </script>
+    
+    <style>
+        body {
+            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.6);
+        }
     </style>
 </head>
-<body>
+<body class="text-slate-100 antialiased py-6 px-4 sm:px-6 md:py-10 flex flex-col items-center">
 
-    <div class="container">
-        <!-- Pomodoro Section -->
-        <div class="card">
-            <h2><i class="fa-solid fa-stopwatch"></i> Đồng Hồ Pomodoro</h2>
-            <div class="timer-display" id="timer">25:00</div>
-            <div class="timer-btn-group">
-                <button id="start-btn" onclick="toggleTimer()">Bắt đầu</button>
-                <button class="secondary" onclick="resetTimer()">Đặt lại</button>
-                <button class="secondary" onclick="setMode(5)">Nghỉ 5p</button>
-            </div>
-        </div>
+    <header class="text-center mb-6 md:mb-10 max-w-2xl w-full">
+        <a href="index.html" class="inline-flex items-center gap-2 text-sky-400 hover:text-sky-300 font-semibold text-xs md:text-sm bg-sky-500/10 px-4 py-2 rounded-full mb-4 border border-sky-500/20 transition-all">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+        <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-sky-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">
+            GÓC LÀM VIỆC SIÊU NĂNG SUẤT
+        </h1>
+        <p class="text-slate-400 text-xs md:text-sm mt-2">Sự kết hợp hoàn hảo giữa phương pháp Pomodoro và danh sách nhiệm vụ thông minh.</p>
+    </header>
 
-        <!-- Todo List Section -->
-        <div class="card">
-            <h2><i class="fa-solid fa-list-check"></i> Nhiệm Vụ Hôm Nay</h2>
-            <div class="todo-input-group">
-                <input type="text" id="todo-input" placeholder="Thêm công việc mới..." onkeypress="handleKeyPress(event)">
-                <button onclick="addTodo()"><i class="fa-solid fa-plus"></i></button>
+    <!-- Thay đổi từ lg:grid-cols-12 thành xl:grid-cols-12 và căn lề linh hoạt để không bị bóp nghẹt hiển thị -->
+    <main class="max-w-6xl w-full grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        
+        <!-- Cột trái: Đồng hồ Pomodoro (Xl: 5 cột, dưới xl sẽ tự động xếp chồng mượt mà) -->
+        <section class="xl:col-span-5 bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center w-full">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <h2 class="text-md sm:text-lg font-bold text-sky-400 flex items-center gap-2 mb-6 self-start">
+                <i class="fa-solid fa-stopwatch text-xl animate-pulse"></i> Đồng Hồ Pomodoro
+            </h2>
+
+            <!-- Vòng tròn hiển thị thời gian co giãn linh hoạt, không bị tràn trên các màn hình siêu nhỏ -->
+            <div class="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center rounded-full border-4 border-slate-800 shadow-inner bg-slate-950/40 mb-6 sm:mb-8">
+                <div class="text-center px-4">
+                    <span class="text-4xl sm:text-5xl md:text-6xl font-black font-mono tracking-widest text-sky-400" id="timer">25:00</span>
+                    <p class="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1.5" id="timer-status">Đang tập trung</p>
+                </div>
             </div>
-            <ul id="todo-list"></ul>
-        </div>
-    </div>
+
+            <div class="w-full space-y-4">
+                <div class="flex gap-2">
+                    <button id="start-btn" onclick="toggleTimer()" class="flex-1 bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-500 hover:to-indigo-600 text-slate-950 font-extrabold py-3 px-4 sm:py-3.5 sm:px-6 rounded-2xl shadow-lg shadow-sky-500/20 active:scale-95 transition-all text-sm sm:text-base">
+                        Bắt đầu
+                    </button>
+                    <button onclick="resetTimer()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-4 sm:py-3.5 sm:px-5 rounded-2xl active:scale-95 transition-all" title="Đặt lại">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setMode(25, 'Đang tập trung')" class="bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 text-[10px] sm:text-xs py-2 px-1 sm:px-3 rounded-xl font-bold text-slate-300 transition-all">Focus 25p</button>
+                    <button onclick="setMode(5, 'Nghỉ ngắn')" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-[10px] sm:text-xs py-2 px-1 sm:px-3 rounded-xl font-bold text-emerald-400 transition-all">Nghỉ 5p</button>
+                    <button onclick="setMode(15, 'Nghỉ dài')" class="bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-[10px] sm:text-xs py-2 px-1 sm:px-3 rounded-xl font-bold text-violet-400 transition-all">Nghỉ 15p</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cột giữa: To-Do List (Xl: 7 cột, tự động co giãn theo chiều rộng màn hình) -->
+        <section class="xl:col-span-7 bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl flex flex-col min-h-[420px] w-full">
+            <h2 class="text-md sm:text-lg font-bold text-violet-400 flex items-center gap-2 mb-6">
+                <i class="fa-solid fa-list-check text-xl"></i> Nhiệm Vụ Hôm Nay
+            </h2>
+
+            <!-- Form nhập công việc -->
+            <div class="flex gap-2 mb-6">
+                <input type="text" id="todo-input" placeholder="Hôm nay bạn cần hoàn thành việc gì?" onkeypress="handleKeyPress(event)" class="flex-grow bg-slate-950/60 border border-slate-800 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3.5 text-xs sm:text-sm text-slate-100 outline-none placeholder-slate-500 transition-all">
+                <button onclick="addTodo()" class="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white font-bold p-3.5 sm:p-4 rounded-2xl shadow-lg shadow-violet-500/20 active:scale-95 transition-all">
+                    <i class="fa-solid fa-plus text-base sm:text-lg"></i>
+                </button>
+            </div>
+
+            <div class="flex-grow">
+                <ul id="todo-list" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                    <!-- Sẽ được thêm bằng Javascript -->
+                </ul>
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-12 text-slate-500">
+                    <i class="fa-solid fa-feather-pointed text-3xl sm:text-4xl mb-3 opacity-40"></i>
+                    <p class="text-xs sm:text-sm text-center">Mọi công việc đã hoàn thành! Hôm nay thật tuyệt vời.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-span-12 bg-slate-900/40 border border-slate-800/80 rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mt-4 w-full">
+            <h3 class="text-sm sm:text-md font-bold text-indigo-400 flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-circle-info"></i> Khám Phá Phương Pháp Pomodoro & Cách Áp Dụng
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs sm:text-sm leading-relaxed text-slate-400">
+                <div class="space-y-2 bg-slate-950/20 p-4 rounded-2xl border border-slate-800/40">
+                    <h4 class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span> Phương pháp Pomodoro là gì?
+                    </h4>
+                    <p class="text-xs">
+                        Được phát triển bởi Francesco Cirillo vào cuối những năm 1980. Phương pháp này sử dụng đồng hồ bấm giờ để phân chia thời gian làm việc thành các khoảng thời gian tập trung cao độ (thường là 25 phút), ngăn cách bởi các khoảng nghỉ ngắn.
+                    </p>
+                </div>
+                <div class="space-y-2 bg-slate-950/20 p-4 rounded-2xl border border-slate-800/40">
+                    <h4 class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Quy trình 4 bước chuẩn hóa
+                    </h4>
+                    <ol class="list-decimal list-inside text-xs space-y-1">
+                        <li>Chọn một nhiệm vụ cần hoàn thành từ To-Do List.</li>
+                        <li>Bật đồng hồ Pomodoro tập trung cao độ trong 25 phút.</li>
+                        <li>Làm việc không xao lãng cho đến khi chuông reo.</li>
+                        <li>Nghỉ ngơi 5 phút trước khi bắt đầu chu kỳ tiếp theo.</li>
+                    </ol>
+                </div>
+                <div class="space-y-2 bg-slate-950/20 p-4 rounded-2xl border border-slate-800/40">
+                    <h4 class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span> Tại sao nó lại hiệu quả?
+                    </h4>
+                    <p class="text-xs">
+                        Việc đặt ra một giới hạn thời gian buộc bộ não của bạn phải tập trung tối đa, giảm thiểu sự trì hoãn. Đồng thời, các khoảng nghỉ ngắn giúp tái tạo năng lượng, tránh tình trạng quá tải (burnout) khi làm việc trong thời gian dài.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast-container" class="fixed top-6 right-6 z-50 pointer-events-none flex flex-col gap-3 max-w-sm w-full"></div>
 
     <script>
-        // --- POMODORO SYSTEM ---
+        // --- STREAMING_CHUNK: Hệ thống thông báo động Toast thay cho Alert ---
+        // --- 1. HỆ THỐNG THÔNG BÁO TOAST THAY THẾ ALERT() ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 p-4 rounded-2xl shadow-xl border text-sm font-semibold transition-all duration-300 transform translate-x-12 opacity-0 pointer-events-auto bg-slate-900`;
+            
+            let icon = '';
+            if (type === 'success') {
+                toast.classList.add('border-emerald-500/20', 'text-emerald-400');
+                icon = '<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>';
+            } else if (type === 'error') {
+                toast.classList.add('border-rose-500/20', 'text-rose-400');
+                icon = '<i class="fa-solid fa-circle-exclamation text-rose-400 text-lg"></i>';
+            } else {
+                toast.classList.add('border-sky-500/20', 'text-sky-400');
+                icon = '<i class="fa-solid fa-circle-info text-sky-400 text-lg"></i>';
+            }
+
+            toast.innerHTML = `
+                ${icon}
+                <div class="flex-grow">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-slate-300 transition-colors"><i class="fa-solid fa-times"></i></button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4500);
+        }
+
+        // --- 2. PHÁT TIẾNG CHUÔNG TỰ ĐỘNG BẰNG WEB AUDIO API (KHÔNG CẦN FILE ÂM THANH NGOÀI) ---
+        function playBellSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Tiếng Ding 1
+                let osc1 = audioCtx.createOscillator();
+                let gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(830.61, audioCtx.currentTime); // Phím G#5
+                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 1.2);
+
+                // Tiếng Ding 2 (Trễ hơn một chút để tạo sự ngân nga)
+                setTimeout(() => {
+                    let osc2 = audioCtx.createOscillator();
+                    let gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime); // Phím C6
+                    gain2.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 1.5);
+                }, 180);
+
+            } catch (err) {
+                console.log("AudioContext is not allowed or supported yet.", err);
+            }
+        }
+
+        // --- STREAMING_CHUNK: Lập trình logic đồng hồ Pomodoro ---
         let timeLeft = 25 * 60;
         let timerId = null;
         let isRunning = false;
+        let currentStatusText = 'Đang tập trung';
 
         function updateDisplay() {
             const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
             const s = (timeLeft % 60).toString().padStart(2, '0');
             document.getElementById('timer').innerText = `${m}:${s}`;
+            document.getElementById('timer-status').innerText = currentStatusText;
+            
+            // Đồng bộ tiêu đề trang web để dễ theo dõi
+            document.title = `(${m}:${s}) ${currentStatusText}`;
         }
 
         function toggleTimer() {
+            const startBtn = document.getElementById('start-btn');
             if (isRunning) {
                 clearInterval(timerId);
-                document.getElementById('start-btn').innerText = 'Tiếp tục';
+                startBtn.innerText = 'Tiếp tục';
+                startBtn.className = startBtn.className.replace('from-amber-500 to-orange-500', 'from-sky-400 to-indigo-500');
+                showToast("Đã tạm dừng đồng hồ.", "info");
             } else {
                 timerId = setInterval(() => {
                     if (timeLeft > 0) {
@@ -91,11 +260,14 @@
                         updateDisplay();
                     } else {
                         clearInterval(timerId);
-                        alert('Hết giờ làm việc! Hãy nghỉ ngơi thôi.');
+                        playBellSound();
+                        showToast(`Hoàn tất chu trình! [${currentStatusText}] chúc mừng bạn.`, "success");
                         resetTimer();
                     }
                 }, 1000);
-                document.getElementById('start-btn').innerText = 'Tạm dừng';
+                startBtn.innerText = 'Tạm dừng';
+                // Đổi màu nút sang màu cảnh báo khi đang chạy
+                startBtn.className = startBtn.className.replace('from-sky-400 to-indigo-500', 'from-amber-500 to-orange-500');
             }
             isRunning = !isRunning;
         }
@@ -104,19 +276,26 @@
             clearInterval(timerId);
             isRunning = false;
             timeLeft = 25 * 60;
-            document.getElementById('start-btn').innerText = 'Bắt đầu';
+            currentStatusText = 'Đang tập trung';
+            const startBtn = document.getElementById('start-btn');
+            startBtn.innerText = 'Bắt đầu';
+            startBtn.className = 'flex-1 bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-500 hover:to-indigo-600 text-slate-950 font-extrabold py-3.5 px-6 rounded-2xl shadow-lg shadow-sky-500/20 active:scale-95 transition-all';
             updateDisplay();
         }
 
-        function setMode(minutes) {
+        function setMode(minutes, statusLabel) {
             clearInterval(timerId);
             isRunning = false;
             timeLeft = minutes * 60;
-            document.getElementById('start-btn').innerText = 'Bắt đầu';
+            currentStatusText = statusLabel;
+            const startBtn = document.getElementById('start-btn');
+            startBtn.innerText = 'Bắt đầu';
+            startBtn.className = 'flex-1 bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-500 hover:to-indigo-600 text-slate-950 font-extrabold py-3.5 px-6 rounded-2xl shadow-lg shadow-sky-500/20 active:scale-95 transition-all';
             updateDisplay();
+            showToast(`Đã chuyển sang chế độ: ${statusLabel}`, "success");
         }
 
-        // --- TODO LIST SYSTEM WITH LOCALSTORAGE ---
+        // --- STREAMING_CHUNK: Lập trình xử lý dữ liệu và lưu trữ To-Do List ---
         let todos = JSON.parse(localStorage.getItem('my_todos')) || [];
 
         function saveTodos() {
@@ -131,6 +310,9 @@
                 todos.push({ text, completed: false, id: Date.now() });
                 input.value = '';
                 saveTodos();
+                showToast("Đã thêm nhiệm vụ mới!");
+            } else {
+                showToast("Vui lòng không bỏ trống nội dung công việc!", "error");
             }
         }
 
@@ -146,27 +328,46 @@
         function deleteTodo(id) {
             todos = todos.filter(t => t.id !== id);
             saveTodos();
+            showToast("Đã xóa nhiệm vụ khỏi danh sách.", "info");
         }
 
+        // --- STREAMING_CHUNK: Vẽ danh sách To-Do mượt mà ra giao diện người dùng ---
         function renderTodos() {
             const list = document.getElementById('todo-list');
+            const emptyState = document.getElementById('empty-state');
             list.innerHTML = '';
-            todos.forEach(t => {
-                const li = document.createElement('li');
-                if (t.completed) li.classList.add('completed');
-                li.innerHTML = `
-                    <span onclick="toggleTodo(${t.id})" style="cursor:pointer; flex:1;">${t.text}</span>
-                    <div class="actions">
-                        <button class="icon-btn" onclick="toggleTodo(${t.id})"><i class="fa-solid fa-check"></i></button>
-                        <button class="icon-btn delete" onclick="deleteTodo(${t.id})"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
-                list.appendChild(li);
-            });
+
+            if (todos.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                todos.forEach(t => {
+                    const li = document.createElement('li');
+                    li.className = `flex items-center justify-between p-4 bg-slate-950/40 border ${t.completed ? 'border-emerald-500/10 bg-emerald-950/5' : 'border-slate-800'} rounded-2xl transition-all hover:border-slate-700 group`;
+                    
+                    li.innerHTML = `
+                        <div class="flex items-center gap-3 flex-grow cursor-pointer" onclick="toggleTodo(${t.id})">
+                            <span class="w-6 h-6 flex items-center justify-center rounded-lg border-2 ${t.completed ? 'border-emerald-500 bg-emerald-500 text-slate-950' : 'border-slate-600'} transition-all">
+                                ${t.completed ? '<i class="fa-solid fa-check text-xs font-bold"></i>' : ''}
+                            </span>
+                            <span class="text-xs sm:text-sm ${t.completed ? 'line-through text-slate-500' : 'text-slate-200'} transition-all">${t.text}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="deleteTodo(${t.id})" class="text-slate-500 hover:text-rose-400 p-2 rounded-lg transition-colors" title="Xóa">
+                                <i class="fa-regular fa-trash-can text-sm"></i>
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            }
         }
 
-        // Init
-        renderTodos();
+        // Khởi động giao diện ban đầu
+        window.onload = function() {
+            updateDisplay();
+            renderTodos();
+        }
     </script>
 </body>
 </html>
