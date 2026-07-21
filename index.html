@@ -3,130 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Góc Nhỏ Nạp Năng Lượng</title>
+    <title>Trang Chủ - Nguyễn Thái Dương</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #06b6d4;
+            --border: #e2e8f0;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
         }
 
         body {
-            height: 100vh;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            transition: background 0.8s ease;
-            color: #fff;
-            padding: 20px;
+            padding: 0 5%;
+            z-index: 1000;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 14px;
             border-radius: 20px;
-            padding: 40px 30px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
         }
 
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
+        .nav-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
         }
 
-        .quote-box {
-            min-height: 120px;
+        .social-icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        .social-icon.facebook:hover { background: #1877f2; }
+        .social-icon.tiktok:hover { background: #000000; }
+        .social-icon.discord:hover { background: #5865f2; }
+
+        .hero {
+            height: 75vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            margin-top: 70px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: all 0.4s ease;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            max-width: 600px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
             margin-bottom: 30px;
+            text-align: center;
         }
 
-        .quote {
-            font-size: 1.2rem;
-            font-style: italic;
-            line-height: 1.6;
-            margin-bottom: 10px;
+        .web-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
         }
 
-        .author {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-weight: 600;
-        }
-
-        button {
-            background-color: #fff;
-            color: #333;
-            border: none;
-            padding: 12px 28px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
+        .web-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-            background-color: #f0f0f0;
+        .web-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
         }
 
-        button:active {
-            transform: translateY(-1px);
+        .card-img-wrapper {
+            height: 180px;
+            overflow: hidden;
+            background: #e2e8f0;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-link {
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 6px;
+            font-size: 1.5rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .star-rating i.active { color: #f59e0b; }
+
+        textarea, input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .thanks-section {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .thanks-section h2 { color: var(--primary); }
+
+        footer {
+            background: #090d16;
+            color: #94a3b8;
+            padding: 30px 20px;
+            font-size: 0.85rem;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-auth {
+            display: flex;
+            gap: 6px;
+        }
+
+        .admin-auth input {
+            margin: 0;
+            padding: 6px 10px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+        }
+
+        .admin-auth button {
+            padding: 6px 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .add-btn-float {
+            display: none;
+            position: fixed;
+            bottom: 25px; right: 25px;
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 1.6rem;
+            border: none;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            cursor: pointer;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>✨ Góc Nạp Động Lực ✨</h1>
-        <div class="quote-box">
-            <p class="quote" id="quote">"Hành trình vạn dặm bắt đầu từ một bước chân."</p>
-            <p class="author" id="author">— Lão Tử</p>
+    <nav>
+        <div class="nav-logo">DUONG.SITE</div>
+        <div class="nav-links">
+            <a href="https://github.com/duongngoo2k11-sketch" target="_blank" class="nav-btn">
+                <i class="fa-brands fa-github"></i>
+                <span>Kho lưu trữ / Mã nguồn</span>
+            </a>
+            <button class="nav-btn" onclick="openReviewModal()">
+                <i class="fa-solid fa-star"></i>
+                <span>Đánh giá & Phản hồi</span>
+            </button>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61568473183500" target="_blank" class="social-icon facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://www.tiktok.com/@66dng.nguyn" target="_blank" class="social-icon tiktok"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="https://discord.com" target="_blank" class="social-icon discord" title="Discord: Duongggggowo"><i class="fa-brands fa-discord"></i></a>
+            </div>
         </div>
-        <button onclick="generateBoost()">Đổi Không Khí!</button>
+    </nav>
+
+    <section class="hero">
+        <h1 id="hero-title">TRANG CHỦ</h1>
+        <p>Chào mừng bạn đến với trang web cá nhân của Nguyễn Thái Dương. Cuộn xuống để xem các dự án & liên kết trang web!</p>
+    </section>
+
+    <div class="container">
+        <h2 class="section-title">DANH SÁCH TRANG WEB</h2>
+        <div class="web-grid" id="webGrid">
+            <div class="web-card">
+                <div class="card-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80" alt="Preview">
+                </div>
+                <div class="card-content">
+                    <a href="https://duongngoo2k11-sketch.github.io/webcuarduong/" target="_blank" class="card-link">https://duongngoo2k11-sketch.github.io/webcuarduong/</a>
+                    <p class="card-desc">Website dự án cá nhân được lưu trữ trực tiếp trên GitHub Pages. Nơi chia sẻ các dự án lập trình và ý tưởng cá nhân.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="thanks-section">
+        <h2>THANKS FOR VISITING! ❤️</h2>
+        <p style="color: var(--text-muted); margin-top: 8px;">Cảm ơn bạn đã ghé thăm trang web của mình!</p>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div>
+                <p><strong>Chủ sở hữu:</strong> Nguyễn Thái Dương</p>
+                <p><strong>SĐT:</strong> 0961940490</p>
+                <p><strong>Email:</strong> duongngoo2k11@gmail.com</p>
+                <p><strong>Thực hiện:</strong> Gemini AI & Nguyễn Thái Dương</p>
+            </div>
+            <div class="admin-auth">
+                <input type="password" id="adminPass" placeholder="Nhập mật khẩu Admin...">
+                <button onclick="checkAdmin()">Xác nhận</button>
+            </div>
+        </div>
+    </footer>
+
+    <button class="add-btn-float" id="addBtn" onclick="openAddModal()">+</button>
+
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeReviewModal()">&times;</span>
+            <h3>Đánh giá & Phản hồi</h3>
+            <div class="star-rating" id="starRating">
+                <i class="fa-solid fa-star" data-value="1"></i>
+                <i class="fa-solid fa-star" data-value="2"></i>
+                <i class="fa-solid fa-star" data-value="3"></i>
+                <i class="fa-solid fa-star" data-value="4"></i>
+                <i class="fa-solid fa-star" data-value="5"></i>
+            </div>
+            <textarea id="reviewText" rows="3" placeholder="Nhập cảm nhận của bạn..."></textarea>
+            <button class="btn-submit" onclick="submitReview()">Gửi đánh giá</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAddModal()">&times;</span>
+            <h3>Thêm Trang Web Mới</h3>
+            <input type="text" id="webUrl" placeholder="Đường link trang web (https://...)">
+            <input type="text" id="webImg" placeholder="Link ảnh xem trước">
+            <textarea id="webDesc" rows="3" placeholder="Mô tả trang web..."></textarea>
+            <button class="btn-submit" onclick="addNewWeb()">Thêm Hoàn Tất</button>
+        </div>
     </div>
 
     <script>
-        const quotes = [
-            { quote: "Hành trình vạn dặm bắt đầu từ một bước chân.", author: "Lão Tử" },
-            { quote: "Cách tốt nhất để dự đoán tương lai là tự tạo ra nó.", author: "Abraham Lincoln" },
-            { quote: "Thành công không phải là đích đến, đó là một hành trình.", author: "Zig Ziglar" },
-            { quote: "Mọi thứ bạn từng muốn đều nằm ở phía bên kia của sự sợ hãi.", author: "George Addair" },
-            { quote: "Đừng chờ đợi cơ hội, hãy tự tạo ra nó.", author: "Khuyết danh" },
-            { quote: "Mỗi ngày mới là một cơ hội để làm tốt hơn ngày hôm qua.", author: "Khuyết danh" }
-        ];
+        window.addEventListener('scroll', () => {
+            const heroTitle = document.getElementById('hero-title');
+            if (window.scrollY > 80) {
+                heroTitle.style.opacity = '0';
+                heroTitle.style.transform = 'translateY(-40px)';
+            } else {
+                heroTitle.style.opacity = '1';
+                heroTitle.style.transform = 'translateY(0)';
+            }
+        });
 
-        const gradients = [
-            'linear-gradient(135deg, #667eea, #764ba2)',
-            'linear-gradient(135deg, #ff9a9e, #fecfef)',
-            'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
-            'linear-gradient(135deg, #84fab0, #8fd3f4)',
-            'linear-gradient(135deg, #fccb90, #d57eeb)',
-            'linear-gradient(135deg, #e0c3fc, #8ec5fc)'
-        ];
+        let selectedStars = 5;
+        const stars = document.querySelectorAll('#starRating i');
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedStars = parseInt(star.getAttribute('data-value'));
+                stars.forEach((s, idx) => {
+                    if (idx < selectedStars) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+            });
+        });
 
-        function generateBoost() {
-            // Lấy ngẫu nhiên câu nói
-            const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
-            document.getElementById('quote').innerText = `"${quotes[randomQuoteIndex].quote}"`;
-            document.getElementById('author').innerText = `— ${quotes[randomQuoteIndex].author}`;
+        function openReviewModal() { document.getElementById('reviewModal').style.display = 'flex'; }
+        function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
+        function submitReview() {
+            alert('Cảm ơn bạn đã gửi đánh giá!');
+            closeReviewModal();
+        }
 
-            // Lấy ngẫu nhiên màu nền
-            const randomGradientIndex = Math.floor(Math.random() * gradients.length);
-            document.body.style.background = gradients[randomGradientIndex];
+        function checkAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === '123456') {
+                alert('Mật khẩu đúng! Đã hiện nút (+) để thêm web mới.');
+                document.getElementById('addBtn').style.display = 'block';
+            } else {
+                alert('Mật khẩu không đúng!');
+            }
+        }
+
+        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
+        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+
+        function addNewWeb() {
+            const url = document.getElementById('webUrl').value;
+            const img = document.getElementById('webImg').value || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80';
+            const desc = document.getElementById('webDesc').value;
+
+            if(!url || !desc) { alert('Vui lòng nhập đủ thông tin!'); return; }
+
+            const grid = document.getElementById('webGrid');
+            const card = document.createElement('div');
+            card.className = 'web-card';
+            card.innerHTML = `
+                <div class="card-img-wrapper"><img src="${img}"></div>
+                <div class="card-content">
+                    <a href="${url}" target="_blank" class="card-link">${url}</a>
+                    <p class="card-desc">${desc}</p>
+                </div>
+            `;
+            grid.appendChild(card);
+            closeAddModal();
         }
     </script>
-
 </body>
 </html>
