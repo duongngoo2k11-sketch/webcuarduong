@@ -2,603 +2,346 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đế Chế Code - Code Empire RTS</title>
+    <title>Đế Chế Code - Real AI Agent (Q-Learning Machine Learning)</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body { font-family: 'Consolas', 'Courier New', monospace; background: #0f172a; color: #f8fafc; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Courier New', monospace; background: #050505; color: #00ff66; padding: 15px; display: flex; flex-direction: column; gap: 15px; height: 100vh; }
+        h1 { font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #00ff66; padding-bottom: 5px; }
         
-        /* Layout Grid */
-        #app { display: grid; grid-template-columns: 320px 1fr 300px; grid-template-rows: 40px 1fr 220px; height: 100vh; width: 100vw; }
+        /* Dashboard Layout */
+        .dashboard { display: grid; grid-template-columns: 1fr 350px; gap: 15px; flex: 1; min-height: 0; }
         
-        /* Top Navigation Bar */
-        header { grid-column: 1 / -1; background: #1e293b; border-bottom: 2px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-weight: bold; }
-        .res-container { display: flex; gap: 20px; }
-        .res-item { display: flex; align-items: center; gap: 6px; font-size: 14px; }
-        .res-val { color: #38bdf8; }
+        /* Game Grid View (Minimal Graphics) */
+        #game-view { background: #000; border: 1px solid #00ff66; padding: 10px; display: flex; flex-direction: column; }
+        #map-grid { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; flex: 1; background: #111; padding: 5px; border: 1px solid #222; }
+        .cell { background: #050505; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        .cell.player-base { background: #003366; color: #66b2ff; border: 1px solid #0066cc; }
+        .cell.ai-base { background: #660000; color: #ff6666; border: 1px solid #cc0000; }
+        .cell.node { background: #333300; color: #ffff00; }
+        .cell.player-unit { color: #00ffff; }
+        .cell.ai-unit { color: #ff3333; }
         
-        /* Left Panel: Control & Manual Units */
-        #left-panel { background: #1e293b; border-right: 2px solid #334155; padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
-        .panel-title { font-size: 14px; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 4px; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        button { background: #334155; color: #f8fafc; border: 1px solid #475569; padding: 8px; font-family: inherit; font-size: 12px; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
-        button:hover { background: #475569; border-color: #38bdf8; }
-        button:active { transform: scale(0.98); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Center Canvas Screen */
-        #canvas-container { position: relative; background: #020617; overflow: hidden; }
-        canvas { display: block; width: 100%; height: 100%; }
-        #game-overlay { position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.8); padding: 8px 12px; border-radius: 4px; font-size: 12px; border: 1px solid #334155; }
-
-        /* Right Panel: AI Boss Status & Stats */
-        #right-panel { background: #1e293b; border-left: 2px solid #334155; padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
-        .boss-stat { background: #0f172a; padding: 8px; border-radius: 4px; border-left: 3px solid #ef4444; font-size: 12px; }
-
-        /* Bottom Panel: Code IDE Terminal */
-        #code-panel { grid-column: 1 / -1; background: #090d16; border-top: 2px solid #334155; display: grid; grid-template-columns: 1fr 350px; }
-        #editor-container { display: flex; flex-direction: column; border-right: 1px solid #334155; }
-        .editor-header { background: #1e293b; padding: 4px 12px; font-size: 12px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; }
-        textarea#code-input { flex: 1; background: transparent; color: #4ade80; border: none; padding: 10px; font-family: 'Consolas', monospace; font-size: 13px; resize: none; outline: none; line-height: 1.4; }
-        #console-log { background: #020617; padding: 10px; font-size: 11px; overflow-y: auto; color: #94a3b8; font-family: monospace; }
-        .log-entry { margin-bottom: 4px; border-bottom: 1px dashed #1e293b; padding-bottom: 2px; }
-        .log-err { color: #f87171; }
-        .log-sys { color: #38bdf8; }
-
-        /* Healthbar HUD */
-        .hp-bar { height: 4px; background: #334155; border-radius: 2px; overflow: hidden; margin-top: 2px; }
-        .hp-fill { height: 100%; background: #22c55e; transition: width 0.2s; }
-        .hp-fill.boss { background: #ef4444; }
+        /* AI Brain Stats Panel */
+        #ai-brain { background: #0a0a0a; border: 1px solid #00ff66; padding: 10px; display: flex; flex-direction: column; gap: 10px; font-size: 12px; overflow-y: auto; }
+        .brain-card { background: #111; padding: 8px; border-left: 3px solid #00ff66; }
+        .q-table { font-size: 10px; width: 100%; border-collapse: collapse; margin-top: 5px; }
+        .q-table td, .q-table th { border: 1px solid #333; padding: 3px; text-align: center; }
+        
+        /* IDE & Console Controls */
+        #controls { height: 180px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        textarea { background: #000; color: #00ff66; border: 1px solid #00ff66; padding: 8px; font-family: monospace; font-size: 12px; resize: none; outline: none; }
+        #console { background: #0a0a0a; border: 1px solid #00ff66; padding: 8px; font-size: 11px; overflow-y: auto; color: #aaa; }
+        .sys { color: #00ffff; }
+        .ai-log { color: #ff6666; }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <!-- Header: Resources & Status -->
-    <header>
-        <div>CODE EMPIRE RTS v1.0</div>
-        <div class="res-container">
-            <div class="res-item">ĐIỆN: <span id="res-power" class="res-val">1000</span></div>
-            <div class="res-item">KIM LOẠI: <span id="res-metal" class="res-val">500</span></div>
-            <div class="res-item">QUÂN SỰ: <span id="res-units" class="res-val">0/50</span></div>
-            <div class="res-item">BOSS NÂNG CẤP: <span id="boss-timer" style="color:#ef4444">1.0s</span></div>
-        </div>
-    </header>
+<h1>👾 DE CHE CODE: THỰC THỂ AI TỰ HỌC (Q-LEARNING AGENT)</h1>
 
-    <!-- Left Controls Panel -->
-    <div id="left-panel">
-        <div class="panel-title">Tạo Quân Thủ Công</div>
-        <div class="btn-grid">
-            <button onclick="manualSpawn('SOLDIER')">Lính Bộ (50M/20E)</button>
-            <button onclick="manualSpawn('TANK')">Xe Tăng (150M/50E)</button>
-            <button onclick="manualSpawn('TURRET')">Tháp Pháo (100M/100E)</button>
-            <button onclick="manualSpawn('COLLECTOR')">Xe Khoáng (80M/10E)</button>
+<div class="dashboard">
+    <!-- Visual Grid -->
+    <div id="game-view">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 5px; font-size:12px;">
+            <span>PLAYER METAL: <b id="p-metal">200</b> | UNITS: <b id="p-units">0</b></span>
+            <span>AI METAL: <b id="ai-metal">200</b> | UNITS: <b id="ai-units">0</b></span>
         </div>
-
-        <div class="panel-title" style="margin-top: 10px;">Lệnh Điều Khiển Nhanh</div>
-        <button onclick="executeCommand('ATTACK_ALL')">⚔️ Tổng Tấn Công Boss</button>
-        <button onclick="executeCommand('DEFEND_BASE')">🛡️ Lùi Về Thủ Căn Cứ</button>
-        <button onclick="executeCommand('CLEAR_DEAD')">🧹 Dọn Xác Quân Đội</button>
-
-        <div class="panel-title" style="margin-top: 10px;">Thống Kê Trận Đấu</div>
-        <div id="player-stats" style="font-size:12px; color: #94a3b8; line-height: 1.6;">
-            Sát thương đã gây: <span id="stat-damage" style="color:white">0</span><br>
-            Quân đã tiêu diệt: <span id="stat-kills" style="color:white">0</span><br>
-            Thu thập Kim loại: <span id="stat-mined" style="color:white">0</span>
-        </div>
+        <div id="map-grid"></div>
     </div>
 
-    <!-- Main Game Canvas -->
-    <div id="canvas-container">
-        <canvas id="gameCanvas"></canvas>
-        <div id="game-overlay">
-            Trạng Thái Boss: <strong id="boss-state-text" style="color: #ef4444;">ĐANG NÂNG CẤP TIÊN TIẾN</strong>
+    <!-- AI Neural/Q-Table Inspection Panel -->
+    <div id="ai-brain">
+        <div class="brain-card">
+            <strong>BỘ TRÍ TUỆ NHÂN TẠO (Q-LEARNING ENGINE)</strong><br>
+            Tỉ lệ khám phá (Epsilon): <span id="ai-epsilon" style="color:#ffff00">1.00</span><br>
+            Hệ số học hỏi (Alpha): <span>0.2</span> | Chiết khấu (Gamma): <span>0.9</span>
+        </div>
+        <div class="brain-card">
+            <strong>HÀM THƯỞNG AI (REWARD MATRIX)</strong><br>
+            • Hạ lính địch: <span style="color:#00ff66">+50 điểm</span><br>
+            • Đánh Căn Cứ: <span style="color:#00ff66">+100 điểm</span><br>
+            • Thua trận / Mất lính: <span style="color:#ff3333">-30 điểm</span>
+        </div>
+        <div class="brain-card">
+            <strong>BẢNG MA TRẬN QUYẾT ĐỊNH (Q-TABLE TOP STATES)</strong>
+            <table class="q-table">
+                <thead>
+                    <tr><th>Trạng Thái</th><th>Tạo Lính</th><th>Tấn Công</th><th>Thủ</th></tr>
+                </thead>
+                <tbody id="q-table-body">
+                    <tr><td colspan="4">Đang thu thập dữ liệu học...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Right Panel: AI Boss Status -->
-    <div id="right-panel">
-        <div class="panel-title">BOSS AI - OVERLORD CORE</div>
-        <div class="boss-stat">
-            <strong>HP Căn Cứ Boss:</strong>
-            <div class="hp-bar"><div id="boss-hp-bar" class="hp-fill boss" style="width: 100%;"></div></div>
-            <span id="boss-hp-text">10000 / 10000</span>
-        </div>
-        <div class="boss-stat">
-            <strong>Cấp Độ AI:</strong> <span id="boss-level" style="color:#ef4444; font-weight:bold;">1</span><br>
-            <strong>Số Lượng Lực Lượng:</strong> <span id="boss-unit-count">0</span><br>
-            <strong>Tốc Độ Sinh Quân:</strong> <span id="boss-spawn-rate">1 quân / 3s</span>
-        </div>
-        <div class="panel-title">Nhật Ký Nâng Cấp AI</div>
-        <div id="boss-logs" style="font-size:11px; color:#f87171; height: 180px; overflow-y:auto; background:#0f172a; padding:6px; border-radius:4px;">
-            [00:00] Boss AI bắt đầu khởi tạo hệ thống...<br>
-        </div>
-    </div>
+<!-- Player Code Editor & Log -->
+<div id="controls">
+    <textarea id="player-code" spellcheck="false">// VIẾT BOT CỦA BẠN ĐỂ ĐẤU VỚI AI THỰC THỤ
+// Hàm gọi mỗi lượt: Player.spawn(), Player.attackAll()
 
-    <!-- Bottom Panel: Code Editor & Console IDE -->
-    <div id="code-panel">
-        <div id="editor-container">
-            <div class="editor-header">
-                <span>HỆ THỐNG VIẾT CODE LẬP TRÌNH CHIẾN THUẬT (AUTO EXECUTE / 2 SECONDS)</span>
-                <button onclick="runCustomCode()" style="background:#22c55e; border:none; padding: 2px 8px;">▶ Tải Code Ngay</button>
-            </div>
-            <textarea id="code-input" spellcheck="false">// Viết code JS để tự động hóa Đế Chế của bạn
-// Biến có sẵn: Game, Player, Spawn(type), CommandAll(action)
-
-if (Player.metal >= 150) {
-    Spawn('TANK'); // Tự động tạo xe tăng khi đủ Kim loại
+if (Player.metal >= 50) {
+    Player.spawn();
 }
-
-if (Player.power >= 100) {
-    Spawn('SOLDIER');
-}
-
-// Tự động ra lệnh tấn công khi quân đội đủ mạnh (> 15 quân)
-if (Player.units.length > 15) {
-    CommandAll('ATTACK');
-} else if (Player.units.length < 5) {
-    CommandAll('DEFEND');
-}
-            </textarea>
-        </div>
-        <div id="console-log">
-            <div class="log-entry log-sys">[Hệ thống] Trình biên dịch Code đã sẵn sàng.</div>
-        </div>
+if (Player.units.length >= 3) {
+    Player.attackAll();
+}</textarea>
+    <div id="console">
+        <div class="sys">[Hệ thống] Môi trường Học Máy Reinforcement Learning đã kích hoạt.</div>
     </div>
 </div>
 
 <script>
 /**
- * ENGINE GAME CHIẾN THUẬT ĐẾ CHẾ CODE (CODE EMPIRE RTS)
- * Tự động vận hành canvas, vật lý, AI Boss nâng cấp liên tục mỗi giây.
+ * THUẬT TOÁN HỌC TĂNG CƯỜNG (REINFORCEMENT LEARNING - Q-LEARNING)
+ * AI sẽ quan sát trạng thái Trận đấu (State), đưa ra Hành động (Action),
+ * nhận Điểm thưởng (Reward) và cập nhật Bảng Q-Table để thông minh hơn theo thời gian.
  */
 
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+// Grid Config
+const GRID_SIZE = 20;
+const gridEl = document.getElementById('map-grid');
 
-// Fit Canvas Dimensions
-function resizeCanvas() {
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-// Global Game State
-const Game = {
-    running: true,
-    time: 0,
-    width: 0,
-    height: 0,
-    nodes: [], // Tài nguyên
-    projectiles: [],
-    particles: []
-};
-
-// Player State
-const Player = {
-    metal: 600,
-    power: 300,
-    units: [],
-    base: { x: 100, y: 0, hp: 5000, maxHp: 5000, radius: 40 },
-    stats: { damage: 0, kills: 0, mined: 0 }
-};
-
-// Boss AI State
-const Boss = {
-    level: 1,
-    metal: 1000,
-    power: 1000,
-    timer: 0,
-    spawnCooldown: 0,
-    base: { x: 0, y: 0, hp: 10000, maxHp: 10000, radius: 50 },
-    units: [],
-    upgrades: {
-        attackMultiplier: 1.0,
-        hpMultiplier: 1.0,
-        spawnRate: 3.0 // giây mỗi quân
-    }
-};
-
-// Unit Templates
-const UNIT_TYPES = {
-    SOLDIER: { hp: 100, damage: 12, range: 60, speed: 1.8, costM: 50, costP: 20, radius: 8, color: '#38bdf8' },
-    TANK: { hp: 350, damage: 45, range: 120, speed: 1.0, costM: 150, costP: 50, radius: 14, color: '#0284c7' },
-    TURRET: { hp: 500, damage: 30, range: 200, speed: 0, costM: 100, costP: 100, radius: 16, color: '#f59e0b' },
-    COLLECTOR: { hp: 80, damage: 0, range: 20, speed: 2.2, costM: 80, costP: 10, radius: 10, color: '#4ade80' }
-};
-
-const BOSS_UNIT_TYPES = {
-    CYBORG: { hp: 120, damage: 15, range: 70, speed: 1.6, radius: 9, color: '#ef4444' },
-    MECHA: { hp: 450, damage: 55, range: 140, speed: 0.9, radius: 16, color: '#b91c1c' },
-    DESTROYER: { hp: 1000, damage: 90, range: 180, speed: 0.6, radius: 22, color: '#7f1d1d' }
-};
-
-// Initialize Positions
-function initGame() {
-    Game.width = canvas.width;
-    Game.height = canvas.height;
-    
-    Player.base.y = Game.height / 2;
-    Boss.base.x = Game.width - 100;
-    Boss.base.y = Game.height / 2;
-
-    // Create Resource Nodes in Center
-    for(let i = 0; i < 8; i++) {
-        Game.nodes.push({
-            x: Game.width / 2 + (Math.random() - 0.5) * 200,
-            y: 100 + i * ((Game.height - 200) / 7),
-            amount: 2000,
-            radius: 15
-        });
-    }
-}
-
-// Log Utility
-function logConsole(msg, isErr = false) {
-    const logBox = document.getElementById('console-log');
+// Build Grid UI
+const cells = [];
+for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
     const div = document.createElement('div');
-    div.className = `log-entry ${isErr ? 'log-err' : ''}`;
-    div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
-    logBox.appendChild(div);
-    logBox.scrollTop = logBox.scrollHeight;
+    div.className = 'cell';
+    gridEl.appendChild(div);
+    cells.push(div);
 }
 
-function logBoss(msg) {
-    const bossLogBox = document.getElementById('boss-logs');
-    bossLogBox.innerHTML += `[${Math.floor(Game.time)}s] ${msg}<br>`;
-    bossLogBox.scrollTop = bossLogBox.scrollHeight;
-}
+// Game State
+const Game = {
+    turn: 0,
+    nodes: [GRID_SIZE * 5 + 10, GRID_SIZE * 14 + 10], // Vị trí Mỏ khoáng
+    pBase: GRID_SIZE * 10 + 1,                       // Căn cứ Player (Trái)
+    aiBase: GRID_SIZE * 10 + (GRID_SIZE - 2)          // Căn cứ AI (Phải)
+};
 
-// Manual & Code Spawn Functions
-function Spawn(type) {
-    const proto = UNIT_TYPES[type];
-    if (!proto) return false;
-    if (Player.metal >= proto.costM && Player.power >= proto.costP && Player.units.length < 50) {
-        Player.metal -= proto.costM;
-        Player.power -= proto.costP;
-        
-        Player.units.push({
-            ...proto,
-            type: type,
-            x: Player.base.x + 50 + Math.random() * 20,
-            y: Player.base.y + (Math.random() - 0.5) * 80,
-            maxHp: proto.hp,
-            target: null,
-            state: 'IDLE' // IDLE, ATTACK, RETREAT, HARVEST
-        });
-        return true;
-    }
-    return false;
-}
-
-function manualSpawn(type) {
-    if (!Spawn(type)) {
-        logConsole(`Không đủ tài nguyên để tạo ${type}!`, true);
-    }
-}
-
-function CommandAll(action) {
-    Player.units.forEach(u => {
-        if (action === 'ATTACK') u.state = 'ATTACK';
-        if (action === 'DEFEND') u.state = 'RETREAT';
-    });
-}
-
-function executeCommand(cmd) {
-    if (cmd === 'ATTACK_ALL') CommandAll('ATTACK');
-    if (cmd === 'DEFEND_BASE') CommandAll('DEFEND');
-    if (cmd === 'CLEAR_DEAD') Player.units = Player.units.filter(u => u.hp > 0);
-}
-
-// Boss Artificial Intelligence Loop
-function updateBossAI(dt) {
-    Boss.timer += dt;
-    Boss.spawnCooldown += dt;
-
-    // Boss Auto Upgrade Every 1 Second
-    if (Boss.timer >= 1.0) {
-        Boss.timer = 0;
-        Boss.level += 1;
-        Boss.upgrades.attackMultiplier += 0.05; // 5% tăng Sát thương/s
-        Boss.upgrades.hpMultiplier += 0.08;     // 8% tăng Máu/s
-        if (Boss.upgrades.spawnRate > 0.5) {
-            Boss.upgrades.spawnRate -= 0.03;   // Tăng tốc độ đẻ quân
+// Player Entity
+const Player = {
+    metal: 200,
+    units: [], // Array of cell indices
+    spawn: function() {
+        if (this.metal >= 50) {
+            this.metal -= 50;
+            this.units.push(Game.pBase + 1);
+            log("Player đã tạo 1 Lính!", "sys");
         }
-
-        document.getElementById('boss-level').innerText = Boss.level;
-        if (Boss.level % 10 === 0) {
-            logBoss(`⚠️ WARN: Overlord nâng cấp Làn Sóng Cấp ${Boss.level}!`);
-        }
-    }
-
-    // Boss Auto Spawn Units
-    if (Boss.spawnCooldown >= Boss.upgrades.spawnRate) {
-        Boss.spawnCooldown = 0;
-        
-        let type = 'CYBORG';
-        if (Boss.level > 15 && Math.random() > 0.5) type = 'MECHA';
-        if (Boss.level > 35 && Math.random() > 0.8) type = 'DESTROYER';
-
-        const proto = BOSS_UNIT_TYPES[type];
-        Boss.units.push({
-            ...proto,
-            hp: proto.hp * Boss.upgrades.hpMultiplier,
-            maxHp: proto.hp * Boss.upgrades.hpMultiplier,
-            damage: proto.damage * Boss.upgrades.attackMultiplier,
-            x: Boss.base.x - 50 - Math.random() * 20,
-            y: Boss.base.y + (Math.random() - 0.5) * 120,
-            target: null,
-            state: 'ATTACK'
+    },
+    attackAll: function() {
+        this.units = this.units.map(pos => {
+            if (pos % GRID_SIZE < GRID_SIZE - 1) return pos + 1; // Di chuyển sang phải về phía AI
+            return pos;
         });
     }
+};
 
-    // Update UI Stats for Boss
-    document.getElementById('boss-unit-count').innerText = Boss.units.length;
-    document.getElementById('boss-spawn-rate').innerText = `${Boss.upgrades.spawnRate.toFixed(2)}s / quân`;
-    const bossHpPct = Math.max(0, (Boss.base.hp / Boss.base.maxHp) * 100);
-    document.getElementById('boss-hp-bar').style.width = `${bossHpPct}%`;
-    document.getElementById('boss-hp-text').innerText = `${Math.ceil(Boss.base.hp)} / ${Boss.base.maxHp}`;
-}
+// --- BỘ NÃO AI THỰC THỤ (REAL Q-LEARNING AGENT) ---
+const AIAgent = {
+    metal: 200,
+    units: [],
+    qTable: {},     // Ma trận Q-Table ghi nhớ kinh nghiệm
+    alpha: 0.2,     // Tốc độ học (Learning Rate)
+    gamma: 0.9,     // Tầm nhìn tương lai (Discount Factor)
+    epsilon: 0.8,   // Tỉ lệ thử nghiệm ngẫu nhiên (Exploration Rate)
+    lastState: null,
+    lastAction: null,
+    totalReward: 0,
 
-// Execute Player Custom Written JavaScript
-function runCustomCode() {
-    const code = document.getElementById('code-input').value;
-    try {
-        const runFn = new Function('Player', 'Game', 'Spawn', 'CommandAll', code);
-        runFn(Player, Game, Spawn, CommandAll);
-        logConsole("Code thực thi thành công!");
-    } catch (err) {
-        logConsole(`Lỗi Code: ${err.message}`, true);
-    }
-}
+    // 1. Mã hóa Trạng Thái Trận Đấu (Encode State)
+    getState: function() {
+        // State bao gồm: Lượng Kim loại (Thấp/Cao), Số lính AI (0, 1-3, >3), Số lính Player (0, 1-3, >3)
+        const mState = this.metal < 50 ? 'M0' : 'M1';
+        const aiUState = this.units.length === 0 ? 'AI0' : (this.units.length < 3 ? 'AI1' : 'AI2');
+        const pUState = Player.units.length === 0 ? 'P0' : (Player.units.length < 3 ? 'P1' : 'P2');
+        return `${mState}_${aiUState}_${pUState}`;
+    },
 
-// Interval run Player Code every 2 seconds automatically
-setInterval(runCustomCode, 2000);
+    // 2. Chọn Hành Động Dựa Trên Trí Tuệ Học Được (Epsilon-Greedy Choice)
+    chooseAction: function(state) {
+        if (!this.qTable[state]) {
+            this.qTable[state] = { SPAWN: 0, ATTACK: 0, DEFEND: 0 };
+        }
 
-// Physics & Game Loop Update
-function update(dt) {
-    Game.time += dt;
+        // Khám phá ngẫu nhiên (Thử nghiệm)
+        if (Math.random() < this.epsilon) {
+            const actions = ['SPAWN', 'ATTACK', 'DEFEND'];
+            return actions[Math.floor(Math.random() * actions.length)];
+        }
 
-    // Passive Resource Generation
-    Player.power += 5 * dt;
-    Player.metal += 2 * dt;
+        // Khai thác tri thức tốt nhất đã học (Exploit Best Q-Value)
+        const qVals = this.qTable[state];
+        let bestAction = 'SPAWN';
+        let maxQ = -Infinity;
+        for (let act in qVals) {
+            if (qVals[act] > maxQ) {
+                maxQ = qVals[act];
+                bestAction = act;
+            }
+        }
+        return bestAction;
+    },
 
-    // Update Boss AI
-    updateBossAI(dt);
-
-    // Update Player Units Behavior
-    Player.units.forEach(u => {
-        if (u.hp <= 0) return;
-
-        // Collector logic
-        if (u.type === 'COLLECTOR') {
-            let nearestNode = null;
-            let minDist = 99999;
-            Game.nodes.forEach(n => {
-                const d = Math.hypot(n.x - u.x, n.y - u.y);
-                if (d < minDist && n.amount > 0) { minDist = d; nearestNode = n; }
+    // 3. Thực thi Quyết Định của AI
+    executeAction: function(action) {
+        if (action === 'SPAWN' && this.metal >= 50) {
+            this.metal -= 50;
+            this.units.push(Game.aiBase - 1);
+            log("AI Agent quyết định: TẠO QUÂN", "ai-log");
+        } else if (action === 'ATTACK') {
+            this.units = this.units.map(pos => {
+                if (pos % GRID_SIZE > 0) return pos - 1; // Tiến về căn cứ Player
+                return pos;
             });
+            log("AI Agent quyết định: TỔNG TẤN CÔNG", "ai-log");
+        } else if (action === 'DEFEND') {
+            this.units = this.units.map(pos => {
+                if (pos % GRID_SIZE < GRID_SIZE - 2) return pos + 1; // Lùi về thủ nhà
+                return pos;
+            });
+            log("AI Agent quyết định: RÚT QUÂN VỀ THỦ", "ai-log");
+        }
+    },
 
-            if (nearestNode) {
-                if (minDist > u.range) {
-                    u.x += ((nearestNode.x - u.x) / minDist) * u.speed;
-                    u.y += ((nearestNode.y - u.y) / minDist) * u.speed;
-                } else {
-                    nearestNode.amount -= 10 * dt;
-                    Player.metal += 10 * dt;
-                    Player.stats.mined += 10 * dt;
-                }
+    // 4. Học Học Học! Cập nhật Q-Table dựa trên Điểm Thưởng (Bellman Equation)
+    learn: function(newState, reward) {
+        if (this.lastState && this.lastAction) {
+            if (!this.qTable[newState]) {
+                this.qTable[newState] = { SPAWN: 0, ATTACK: 0, DEFEND: 0 };
             }
-            return;
+
+            const oldQ = this.qTable[this.lastState][this.lastAction];
+            const maxFutureQ = Math.max(...Object.values(this.qTable[newState]));
+            
+            // Công thức Bellman học tăng cường
+            const newQ = oldQ + this.alpha * (reward + this.gamma * maxFutureQ - oldQ);
+            this.qTable[this.lastState][this.lastAction] = newQ;
         }
 
-        // Combat Units Logic
-        if (u.state === 'RETREAT') {
-            const distToBase = Math.hypot(Player.base.x - u.x, Player.base.y - u.y);
-            if (distToBase > 60) {
-                u.x += ((Player.base.x - u.x) / distToBase) * u.speed;
-                u.y += ((Player.base.y - u.y) / distToBase) * u.speed;
-            }
-            return;
+        // Giảm dần tỉ lệ ngẫu nhiên (Giúp AI ngày càng khôn hơn)
+        if (this.epsilon > 0.05) this.epsilon -= 0.001;
+        document.getElementById('ai-epsilon').innerText = this.epsilon.toFixed(3);
+    }
+};
+
+// Logging Utility
+function log(msg, cls = "") {
+    const consoleEl = document.getElementById('console');
+    const div = document.createElement('div');
+    div.className = cls;
+    div.innerText = `[Lượt ${Game.turn}] ${msg}`;
+    consoleEl.appendChild(div);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+
+// Render Logic
+function updateUI() {
+    // Clear Board
+    cells.forEach(c => { c.className = 'cell'; c.innerText = ''; });
+
+    // Render Bases & Resource Nodes
+    cells[Game.pBase].classList.add('player-base'); cells[Game.pBase].innerText = 'HQ';
+    cells[Game.aiBase].classList.add('ai-base'); cells[Game.aiBase].innerText = 'AI';
+    Game.nodes.forEach(n => { cells[n].classList.add('node'); cells[n].innerText = 'M'; });
+
+    // Render Player Units
+    Player.units.forEach(pos => {
+        if (cells[pos]) {
+            cells[pos].classList.add('player-unit');
+            cells[pos].innerText = 'P';
         }
+    });
 
-        // Find Targets (Boss Units or Boss Base)
-        let target = null;
-        let minDist = u.range + 1000;
+    // Render AI Units
+    AIAgent.units.forEach(pos => {
+        if (cells[pos]) {
+            cells[pos].classList.add('ai-unit');
+            cells[pos].innerText = 'A';
+        }
+    });
 
-        Boss.units.forEach(e => {
-            if (e.hp <= 0) return;
-            const d = Math.hypot(e.x - u.x, e.y - u.y);
-            if (d < minDist) { minDist = d; target = e; }
+    // Update Top Values
+    document.getElementById('p-metal').innerText = Math.floor(Player.metal);
+    document.getElementById('p-units').innerText = Player.units.length;
+    document.getElementById('ai-metal').innerText = Math.floor(AIAgent.metal);
+    document.getElementById('ai-units').innerText = AIAgent.units.length;
+
+    // Update Q-Table Visualizer
+    const qBody = document.getElementById('q-table-body');
+    qBody.innerHTML = '';
+    let count = 0;
+    for (let state in AIAgent.qTable) {
+        if (count++ > 5) break; // Hiển thị 5 trạng thái tiêu biểu
+        const row = AIAgent.qTable[state];
+        qBody.innerHTML += `<tr>
+            <td><b>${state}</b></td>
+            <td>${row.SPAWN.toFixed(1)}</td>
+            <td>${row.ATTACK.toFixed(1)}</td>
+            <td>${row.DEFEND.toFixed(1)}</td>
+        </tr>`;
+    }
+}
+
+// Game Step (Mỗi lượt biến đổi)
+function gameStep() {
+    Game.turn++;
+    
+    // Thu nhập tài nguyên passive
+    Player.metal += 15;
+    AIAgent.metal += 15;
+
+    // 1. Chạy Code của Người Chơi
+    try {
+        const code = document.getElementById('player-code').value;
+        const playerFn = new Function('Player', code);
+        playerFn(Player);
+    } catch (e) {
+        log(`Lỗi Code Player: ${e.message}`, "sys");
+    }
+
+    // 2. Chạy Trí Tuệ Nhân Tạo AI Agent
+    const currentState = AIAgent.getState();
+    const action = AIAgent.chooseAction(currentState);
+    AIAgent.executeAction(action);
+
+    // 3. Xử lý va chạm chiến đấu & Tính Điểm Thưởng (Reward Signal)
+    let reward = 0;
+
+    // Kiểm tra lính va chạm giáp lá cà
+    Player.units.forEach((pPos, pIdx) => {
+        AIAgent.units.forEach((aPos, aIdx) => {
+            if (pPos === aPos || pPos === aPos + 1) {
+                // Tiêu diệt lẫn nhau
+                Player.units.splice(pIdx, 1);
+                AIAgent.units.splice(aIdx, 1);
+                reward += 20; // AI được thưởng vì hạ lính địch
+                log("⚔️ Giao tranh xảy ra! Cả hai bên đều mất lính.", "sys");
+            }
         });
+    });
 
-        if (!target) {
-            const dBase = Math.hypot(Boss.base.x - u.x, Boss.base.y - u.y);
-            if (dBase < minDist) { target = Boss.base; minDist = dBase; }
-        }
-
-        if (target) {
-            if (minDist > u.range) {
-                u.x += ((target.x - u.x) / minDist) * u.speed;
-                u.y += ((target.y - u.y) / minDist) * u.speed;
-            } else {
-                // Attack Target
-                target.hp -= u.damage * dt;
-                Player.stats.damage += u.damage * dt;
-
-                // Fire Bullet visual
-                if (Math.random() < 0.1) {
-                    Game.projectiles.push({ x: u.x, y: u.y, tx: target.x, ty: target.y, color: '#38bdf8', life: 0.2 });
-                }
-            }
-        } else if (u.state === 'ATTACK') {
-            // Move towards Boss side
-            u.x += u.speed;
+    // AI đánh căn cứ người chơi
+    AIAgent.units.forEach(pos => {
+        if (pos === Game.pBase) {
+            reward += 100; // Cực kỳ khuyến khích đánh căn cứ
+            log("🔥 CAN CỨ PLAYER BỊ TẤN CÔNG!", "ai-log");
         }
     });
 
-    // Update Boss Units Behavior
-    Boss.units.forEach(e => {
-        if (e.hp <= 0) return;
+    // 4. Cho AI Học Học Học!
+    AIAgent.learn(currentState, reward);
+    AIAgent.lastState = currentState;
+    AIAgent.lastAction = action;
 
-        let target = null;
-        let minDist = e.range + 1000;
-
-        Player.units.forEach(u => {
-            if (u.hp <= 0) return;
-            const d = Math.hypot(u.x - e.x, u.y - e.y);
-            if (d < minDist) { minDist = d; target = u; }
-        });
-
-        if (!target) {
-            const dBase = Math.hypot(Player.base.x - e.x, Player.base.y - e.y);
-            if (dBase < minDist) { target = Player.base; minDist = dBase; }
-        }
-
-        if (target) {
-            if (minDist > e.range) {
-                e.x -= ((e.x - target.x) / minDist) * e.speed;
-                e.y -= ((e.y - target.y) / minDist) * e.speed;
-            } else {
-                target.hp -= e.damage * dt;
-                if (Math.random() < 0.1) {
-                    Game.projectiles.push({ x: e.x, y: e.y, tx: target.x, ty: target.y, color: '#ef4444', life: 0.2 });
-                }
-            }
-        }
-    });
-
-    // Clean Dead Units
-    const playerKillsBefore = Boss.units.length;
-    Boss.units = Boss.units.filter(e => e.hp > 0);
-    Player.stats.kills += (playerKillsBefore - Boss.units.length);
-
-    Player.units = Player.units.filter(u => u.hp > 0);
-
-    // Update Projectiles
-    Game.projectiles.forEach(p => p.life -= dt);
-    Game.projectiles = Game.projectiles.filter(p => p.life > 0);
-
-    // Update UI Indicators
-    document.getElementById('res-power').innerText = Math.floor(Player.power);
-    document.getElementById('res-metal').innerText = Math.floor(Player.metal);
-    document.getElementById('res-units').innerText = `${Player.units.length}/50`;
-    document.getElementById('stat-damage').innerText = Math.floor(Player.stats.damage);
-    document.getElementById('stat-kills').innerText = Player.stats.kills;
-    document.getElementById('stat-mined').innerText = Math.floor(Player.stats.mined);
-
-    // Check Win/Loss Condition
-    if (Boss.base.hp <= 0) {
-        alert("CHÚC MỪNG! BẠN ĐÃ VIẾT CODE ĐẢ BẠI THÀNH CÔNG OVERLORD BOSS!");
-        Game.running = false;
-    } else if (Player.base.hp <= 0) {
-        alert("CĂN CỨ CỦA BẠN ĐÃ BỊ PHÁ HỦY! OVERLORD AI CHIẾN THẮNG!");
-        Game.running = false;
-    }
+    updateUI();
 }
 
-// Render Engine (Canvas)
-function render() {
-    ctx.clearRect(0, 0, Game.width, Game.height);
-
-    // Draw Grid Lines (Sci-Fi Background)
-    ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 1;
-    const gridSize = 40;
-    for (let x = 0; x < Game.width; x += gridSize) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, Game.height); ctx.stroke();
-    }
-    for (let y = 0; y < Game.height; y += gridSize) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(Game.width, y); ctx.stroke();
-    }
-
-    // Draw Resource Nodes
-    Game.nodes.forEach(n => {
-        if (n.amount <= 0) return;
-        ctx.fillStyle = '#10b981';
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '10px monospace';
-        ctx.fillText(Math.floor(n.amount), n.x - 12, n.y - 18);
-    });
-
-    // Draw Player Base
-    ctx.fillStyle = '#0284c7';
-    ctx.beginPath();
-    ctx.arc(Player.base.x, Player.base.y, Player.base.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-
-    // Draw Boss Base
-    ctx.fillStyle = '#991b1b';
-    ctx.beginPath();
-    ctx.arc(Boss.base.x, Boss.base.y, Boss.base.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-
-    // Draw Player Units
-    Player.units.forEach(u => {
-        ctx.fillStyle = u.color;
-        ctx.beginPath();
-        ctx.arc(u.x, u.y, u.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // HP bar above unit
-        ctx.fillStyle = 'red';
-        ctx.fillRect(u.x - 10, u.y - u.radius - 6, 20, 3);
-        ctx.fillStyle = '#22c55e';
-        ctx.fillRect(u.x - 10, u.y - u.radius - 6, (u.hp / u.maxHp) * 20, 3);
-    });
-
-    // Draw Boss Units
-    Boss.units.forEach(e => {
-        ctx.fillStyle = e.color;
-        ctx.beginPath();
-        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // HP bar
-        ctx.fillStyle = 'red';
-        ctx.fillRect(e.x - 10, e.y - e.radius - 6, 20, 3);
-        ctx.fillStyle = '#22c55e';
-        ctx.fillRect(e.x - 10, e.y - e.radius - 6, Math.max(0, (e.hp / e.maxHp)) * 20, 3);
-    });
-
-    // Draw Laser Projectiles
-    Game.projectiles.forEach(p => {
-        ctx.strokeStyle = p.color;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p.tx, p.ty);
-        ctx.stroke();
-    });
-}
-
-// Main Game Loop
-let lastTime = performance.now();
-function gameLoop(now) {
-    if (!Game.running) return;
-    const dt = (now - lastTime) / 1000;
-    lastTime = now;
-
-    update(Math.min(dt, 0.1));
-    render();
-
-    requestAnimationFrame(gameLoop);
-}
-
-// Start Game
-initGame();
-requestAnimationFrame(gameLoop);
+// Game Loop: Chạy mỗi 1 giây 1 lượt
+setInterval(gameStep, 1000);
+updateUI();
 
 </script>
 </body>
