@@ -3,359 +3,603 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Space Shooter Deluxe</title>
+    <title>Đế Chế Code - Code Empire RTS</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: #05050a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            color: #fff;
-        }
-        #game-container {
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 255, 204, 0.25), 0 0 80px rgba(255, 0, 128, 0.15);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid #00ffcc44;
-        }
-        canvas {
-            display: block;
-            background: #0a0a16;
-        }
-        .hud {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: bold;
-            color: #00ffcc;
-            text-shadow: 0 0 10px #00ffcc88;
-            pointer-events: none;
-            letter-spacing: 1px;
-        }
-        #game-over-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 10, 22, 0.85);
-            backdrop-filter: blur(5px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        #game-over-screen.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        h1 {
-            font-size: 36px;
-            color: #ff0055;
-            text-shadow: 0 0 20px #ff0055;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .final-score {
-            font-size: 20px;
-            color: #fff;
-            margin-bottom: 25px;
-        }
-        button {
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #0a0a16;
-            background: #00ffcc;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 0 15px #00ffcc;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-        }
-        button:hover {
-            transform: scale(1.05);
-            background: #ffffff;
-            box-shadow: 0 0 25px #ffffff;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { font-family: 'Consolas', 'Courier New', monospace; background: #0f172a; color: #f8fafc; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Layout Grid */
+        #app { display: grid; grid-template-columns: 320px 1fr 300px; grid-template-rows: 40px 1fr 220px; height: 100vh; width: 100vw; }
+        
+        /* Top Navigation Bar */
+        header { grid-column: 1 / -1; background: #1e293b; border-bottom: 2px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-weight: bold; }
+        .res-container { display: flex; gap: 20px; }
+        .res-item { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+        .res-val { color: #38bdf8; }
+        
+        /* Left Panel: Control & Manual Units */
+        #left-panel { background: #1e293b; border-right: 2px solid #334155; padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        .panel-title { font-size: 14px; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        button { background: #334155; color: #f8fafc; border: 1px solid #475569; padding: 8px; font-family: inherit; font-size: 12px; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
+        button:hover { background: #475569; border-color: #38bdf8; }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Center Canvas Screen */
+        #canvas-container { position: relative; background: #020617; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; }
+        #game-overlay { position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.8); padding: 8px 12px; border-radius: 4px; font-size: 12px; border: 1px solid #334155; }
+
+        /* Right Panel: AI Boss Status & Stats */
+        #right-panel { background: #1e293b; border-left: 2px solid #334155; padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        .boss-stat { background: #0f172a; padding: 8px; border-radius: 4px; border-left: 3px solid #ef4444; font-size: 12px; }
+
+        /* Bottom Panel: Code IDE Terminal */
+        #code-panel { grid-column: 1 / -1; background: #090d16; border-top: 2px solid #334155; display: grid; grid-template-columns: 1fr 350px; }
+        #editor-container { display: flex; flex-direction: column; border-right: 1px solid #334155; }
+        .editor-header { background: #1e293b; padding: 4px 12px; font-size: 12px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; }
+        textarea#code-input { flex: 1; background: transparent; color: #4ade80; border: none; padding: 10px; font-family: 'Consolas', monospace; font-size: 13px; resize: none; outline: none; line-height: 1.4; }
+        #console-log { background: #020617; padding: 10px; font-size: 11px; overflow-y: auto; color: #94a3b8; font-family: monospace; }
+        .log-entry { margin-bottom: 4px; border-bottom: 1px dashed #1e293b; padding-bottom: 2px; }
+        .log-err { color: #f87171; }
+        .log-sys { color: #38bdf8; }
+
+        /* Healthbar HUD */
+        .hp-bar { height: 4px; background: #334155; border-radius: 2px; overflow: hidden; margin-top: 2px; }
+        .hp-fill { height: 100%; background: #22c55e; transition: width 0.2s; }
+        .hp-fill.boss { background: #ef4444; }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <div class="hud">
-            <div>SCORE: <span id="score">0</span></div>
-            <div>LEVEL: <span id="level">1</span></div>
+<div id="app">
+    <!-- Header: Resources & Status -->
+    <header>
+        <div>CODE EMPIRE RTS v1.0</div>
+        <div class="res-container">
+            <div class="res-item">ĐIỆN: <span id="res-power" class="res-val">1000</span></div>
+            <div class="res-item">KIM LOẠI: <span id="res-metal" class="res-val">500</span></div>
+            <div class="res-item">QUÂN SỰ: <span id="res-units" class="res-val">0/50</span></div>
+            <div class="res-item">BOSS NÂNG CẤP: <span id="boss-timer" style="color:#ef4444">1.0s</span></div>
         </div>
-        
-        <canvas id="gc" width="450" height="650"></canvas>
+    </header>
 
-        <div id="game-over-screen">
-            <h1>MISSION FAILED</h1>
-            <div class="final-score">Điểm số: <span id="final-score-val">0</span></div>
-            <button onclick="resetGame()">THỬ LẠI</button>
+    <!-- Left Controls Panel -->
+    <div id="left-panel">
+        <div class="panel-title">Tạo Quân Thủ Công</div>
+        <div class="btn-grid">
+            <button onclick="manualSpawn('SOLDIER')">Lính Bộ (50M/20E)</button>
+            <button onclick="manualSpawn('TANK')">Xe Tăng (150M/50E)</button>
+            <button onclick="manualSpawn('TURRET')">Tháp Pháo (100M/100E)</button>
+            <button onclick="manualSpawn('COLLECTOR')">Xe Khoáng (80M/10E)</button>
+        </div>
+
+        <div class="panel-title" style="margin-top: 10px;">Lệnh Điều Khiển Nhanh</div>
+        <button onclick="executeCommand('ATTACK_ALL')">⚔️ Tổng Tấn Công Boss</button>
+        <button onclick="executeCommand('DEFEND_BASE')">🛡️ Lùi Về Thủ Căn Cứ</button>
+        <button onclick="executeCommand('CLEAR_DEAD')">🧹 Dọn Xác Quân Đội</button>
+
+        <div class="panel-title" style="margin-top: 10px;">Thống Kê Trận Đấu</div>
+        <div id="player-stats" style="font-size:12px; color: #94a3b8; line-height: 1.6;">
+            Sát thương đã gây: <span id="stat-damage" style="color:white">0</span><br>
+            Quân đã tiêu diệt: <span id="stat-kills" style="color:white">0</span><br>
+            Thu thập Kim loại: <span id="stat-mined" style="color:white">0</span>
         </div>
     </div>
 
-    <script>
-        const cvs = document.getElementById('gc');
-        const ctx = cvs.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const levelEl = document.getElementById('level');
-        const gameOverScreen = document.getElementById('game-over-screen');
-        const finalScoreVal = document.getElementById('final-score-val');
+    <!-- Main Game Canvas -->
+    <div id="canvas-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="game-overlay">
+            Trạng Thái Boss: <strong id="boss-state-text" style="color: #ef4444;">ĐANG NÂNG CẤP TIÊN TIẾN</strong>
+        </div>
+    </div>
 
-        // Direct audio generator using Web Audio API (No external files needed)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(freq, type, duration) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + duration);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e){}
+    <!-- Right Panel: AI Boss Status -->
+    <div id="right-panel">
+        <div class="panel-title">BOSS AI - OVERLORD CORE</div>
+        <div class="boss-stat">
+            <strong>HP Căn Cứ Boss:</strong>
+            <div class="hp-bar"><div id="boss-hp-bar" class="hp-fill boss" style="width: 100%;"></div></div>
+            <span id="boss-hp-text">10000 / 10000</span>
+        </div>
+        <div class="boss-stat">
+            <strong>Cấp Độ AI:</strong> <span id="boss-level" style="color:#ef4444; font-weight:bold;">1</span><br>
+            <strong>Số Lượng Lực Lượng:</strong> <span id="boss-unit-count">0</span><br>
+            <strong>Tốc Độ Sinh Quân:</strong> <span id="boss-spawn-rate">1 quân / 3s</span>
+        </div>
+        <div class="panel-title">Nhật Ký Nâng Cấp AI</div>
+        <div id="boss-logs" style="font-size:11px; color:#f87171; height: 180px; overflow-y:auto; background:#0f172a; padding:6px; border-radius:4px;">
+            [00:00] Boss AI bắt đầu khởi tạo hệ thống...<br>
+        </div>
+    </div>
+
+    <!-- Bottom Panel: Code Editor & Console IDE -->
+    <div id="code-panel">
+        <div id="editor-container">
+            <div class="editor-header">
+                <span>HỆ THỐNG VIẾT CODE LẬP TRÌNH CHIẾN THUẬT (AUTO EXECUTE / 2 SECONDS)</span>
+                <button onclick="runCustomCode()" style="background:#22c55e; border:none; padding: 2px 8px;">▶ Tải Code Ngay</button>
+            </div>
+            <textarea id="code-input" spellcheck="false">// Viết code JS để tự động hóa Đế Chế của bạn
+// Biến có sẵn: Game, Player, Spawn(type), CommandAll(action)
+
+if (Player.metal >= 150) {
+    Spawn('TANK'); // Tự động tạo xe tăng khi đủ Kim loại
+}
+
+if (Player.power >= 100) {
+    Spawn('SOLDIER');
+}
+
+// Tự động ra lệnh tấn công khi quân đội đủ mạnh (> 15 quân)
+if (Player.units.length > 15) {
+    CommandAll('ATTACK');
+} else if (Player.units.length < 5) {
+    CommandAll('DEFEND');
+}
+            </textarea>
+        </div>
+        <div id="console-log">
+            <div class="log-entry log-sys">[Hệ thống] Trình biên dịch Code đã sẵn sàng.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * ENGINE GAME CHIẾN THUẬT ĐẾ CHẾ CODE (CODE EMPIRE RTS)
+ * Tự động vận hành canvas, vật lý, AI Boss nâng cấp liên tục mỗi giây.
+ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Fit Canvas Dimensions
+function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Global Game State
+const Game = {
+    running: true,
+    time: 0,
+    width: 0,
+    height: 0,
+    nodes: [], // Tài nguyên
+    projectiles: [],
+    particles: []
+};
+
+// Player State
+const Player = {
+    metal: 600,
+    power: 300,
+    units: [],
+    base: { x: 100, y: 0, hp: 5000, maxHp: 5000, radius: 40 },
+    stats: { damage: 0, kills: 0, mined: 0 }
+};
+
+// Boss AI State
+const Boss = {
+    level: 1,
+    metal: 1000,
+    power: 1000,
+    timer: 0,
+    spawnCooldown: 0,
+    base: { x: 0, y: 0, hp: 10000, maxHp: 10000, radius: 50 },
+    units: [],
+    upgrades: {
+        attackMultiplier: 1.0,
+        hpMultiplier: 1.0,
+        spawnRate: 3.0 // giây mỗi quân
+    }
+};
+
+// Unit Templates
+const UNIT_TYPES = {
+    SOLDIER: { hp: 100, damage: 12, range: 60, speed: 1.8, costM: 50, costP: 20, radius: 8, color: '#38bdf8' },
+    TANK: { hp: 350, damage: 45, range: 120, speed: 1.0, costM: 150, costP: 50, radius: 14, color: '#0284c7' },
+    TURRET: { hp: 500, damage: 30, range: 200, speed: 0, costM: 100, costP: 100, radius: 16, color: '#f59e0b' },
+    COLLECTOR: { hp: 80, damage: 0, range: 20, speed: 2.2, costM: 80, costP: 10, radius: 10, color: '#4ade80' }
+};
+
+const BOSS_UNIT_TYPES = {
+    CYBORG: { hp: 120, damage: 15, range: 70, speed: 1.6, radius: 9, color: '#ef4444' },
+    MECHA: { hp: 450, damage: 55, range: 140, speed: 0.9, radius: 16, color: '#b91c1c' },
+    DESTROYER: { hp: 1000, damage: 90, range: 180, speed: 0.6, radius: 22, color: '#7f1d1d' }
+};
+
+// Initialize Positions
+function initGame() {
+    Game.width = canvas.width;
+    Game.height = canvas.height;
+    
+    Player.base.y = Game.height / 2;
+    Boss.base.x = Game.width - 100;
+    Boss.base.y = Game.height / 2;
+
+    // Create Resource Nodes in Center
+    for(let i = 0; i < 8; i++) {
+        Game.nodes.push({
+            x: Game.width / 2 + (Math.random() - 0.5) * 200,
+            y: 100 + i * ((Game.height - 200) / 7),
+            amount: 2000,
+            radius: 15
+        });
+    }
+}
+
+// Log Utility
+function logConsole(msg, isErr = false) {
+    const logBox = document.getElementById('console-log');
+    const div = document.createElement('div');
+    div.className = `log-entry ${isErr ? 'log-err' : ''}`;
+    div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    logBox.appendChild(div);
+    logBox.scrollTop = logBox.scrollHeight;
+}
+
+function logBoss(msg) {
+    const bossLogBox = document.getElementById('boss-logs');
+    bossLogBox.innerHTML += `[${Math.floor(Game.time)}s] ${msg}<br>`;
+    bossLogBox.scrollTop = bossLogBox.scrollHeight;
+}
+
+// Manual & Code Spawn Functions
+function Spawn(type) {
+    const proto = UNIT_TYPES[type];
+    if (!proto) return false;
+    if (Player.metal >= proto.costM && Player.power >= proto.costP && Player.units.length < 50) {
+        Player.metal -= proto.costM;
+        Player.power -= proto.costP;
+        
+        Player.units.push({
+            ...proto,
+            type: type,
+            x: Player.base.x + 50 + Math.random() * 20,
+            y: Player.base.y + (Math.random() - 0.5) * 80,
+            maxHp: proto.hp,
+            target: null,
+            state: 'IDLE' // IDLE, ATTACK, RETREAT, HARVEST
+        });
+        return true;
+    }
+    return false;
+}
+
+function manualSpawn(type) {
+    if (!Spawn(type)) {
+        logConsole(`Không đủ tài nguyên để tạo ${type}!`, true);
+    }
+}
+
+function CommandAll(action) {
+    Player.units.forEach(u => {
+        if (action === 'ATTACK') u.state = 'ATTACK';
+        if (action === 'DEFEND') u.state = 'RETREAT';
+    });
+}
+
+function executeCommand(cmd) {
+    if (cmd === 'ATTACK_ALL') CommandAll('ATTACK');
+    if (cmd === 'DEFEND_BASE') CommandAll('DEFEND');
+    if (cmd === 'CLEAR_DEAD') Player.units = Player.units.filter(u => u.hp > 0);
+}
+
+// Boss Artificial Intelligence Loop
+function updateBossAI(dt) {
+    Boss.timer += dt;
+    Boss.spawnCooldown += dt;
+
+    // Boss Auto Upgrade Every 1 Second
+    if (Boss.timer >= 1.0) {
+        Boss.timer = 0;
+        Boss.level += 1;
+        Boss.upgrades.attackMultiplier += 0.05; // 5% tăng Sát thương/s
+        Boss.upgrades.hpMultiplier += 0.08;     // 8% tăng Máu/s
+        if (Boss.upgrades.spawnRate > 0.5) {
+            Boss.upgrades.spawnRate -= 0.03;   // Tăng tốc độ đẻ quân
         }
 
-        let score = 0;
-        let level = 1;
-        let gameOver = false;
-        let lastShoot = 0;
-        let frameCount = 0;
-
-        // Background Stars System
-        const stars = Array.from({ length: 70 }, () => ({
-            x: Math.random() * cvs.width,
-            y: Math.random() * cvs.height,
-            size: Math.random() * 2 + 0.5,
-            speed: Math.random() * 2 + 0.5
-        }));
-
-        const player = {
-            x: 205, y: 550, w: 40, h: 40, speed: 6
-        };
-
-        let bullets = [];
-        let enemies = [];
-        let particles = [];
-        const keys = {};
-
-        document.addEventListener('keydown', e => keys[e.code] = true);
-        document.addEventListener('keyup', e => keys[e.code] = false);
-
-        function createExplosion(x, y, color) {
-            for (let i = 0; i < 15; i++) {
-                particles.push({
-                    x, y,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8,
-                    radius: Math.random() * 3 + 1,
-                    color,
-                    alpha: 1,
-                    life: 0.03 + Math.random() * 0.03
-                });
-            }
+        document.getElementById('boss-level').innerText = Boss.level;
+        if (Boss.level % 10 === 0) {
+            logBoss(`⚠️ WARN: Overlord nâng cấp Làn Sóng Cấp ${Boss.level}!`);
         }
+    }
 
-        function spawnEnemy() {
-            const spawnRate = Math.max(0.015, 0.03 + level * 0.005);
-            if (Math.random() < spawnRate) {
-                const size = 25 + Math.random() * 15;
-                enemies.push({
-                    x: Math.random() * (cvs.width - size),
-                    y: -size,
-                    w: size,
-                    h: size,
-                    speed: 1.8 + Math.random() * 1.5 + (level * 0.2),
-                    hp: size > 35 ? 2 : 1
-                });
-            }
-        }
+    // Boss Auto Spawn Units
+    if (Boss.spawnCooldown >= Boss.upgrades.spawnRate) {
+        Boss.spawnCooldown = 0;
+        
+        let type = 'CYBORG';
+        if (Boss.level > 15 && Math.random() > 0.5) type = 'MECHA';
+        if (Boss.level > 35 && Math.random() > 0.8) type = 'DESTROYER';
 
-        function update(now) {
-            if (gameOver) return;
+        const proto = BOSS_UNIT_TYPES[type];
+        Boss.units.push({
+            ...proto,
+            hp: proto.hp * Boss.upgrades.hpMultiplier,
+            maxHp: proto.hp * Boss.upgrades.hpMultiplier,
+            damage: proto.damage * Boss.upgrades.attackMultiplier,
+            x: Boss.base.x - 50 - Math.random() * 20,
+            y: Boss.base.y + (Math.random() - 0.5) * 120,
+            target: null,
+            state: 'ATTACK'
+        });
+    }
 
-            frameCount++;
-            level = 1 + Math.floor(score / 150);
-            levelEl.innerText = level;
+    // Update UI Stats for Boss
+    document.getElementById('boss-unit-count').innerText = Boss.units.length;
+    document.getElementById('boss-spawn-rate').innerText = `${Boss.upgrades.spawnRate.toFixed(2)}s / quân`;
+    const bossHpPct = Math.max(0, (Boss.base.hp / Boss.base.maxHp) * 100);
+    document.getElementById('boss-hp-bar').style.width = `${bossHpPct}%`;
+    document.getElementById('boss-hp-text').innerText = `${Math.ceil(Boss.base.hp)} / ${Boss.base.maxHp}`;
+}
 
-            // Update background stars
-            stars.forEach(s => {
-                s.y += s.speed;
-                if (s.y > cvs.height) { s.y = 0; s.x = Math.random() * cvs.width; }
+// Execute Player Custom Written JavaScript
+function runCustomCode() {
+    const code = document.getElementById('code-input').value;
+    try {
+        const runFn = new Function('Player', 'Game', 'Spawn', 'CommandAll', code);
+        runFn(Player, Game, Spawn, CommandAll);
+        logConsole("Code thực thi thành công!");
+    } catch (err) {
+        logConsole(`Lỗi Code: ${err.message}`, true);
+    }
+}
+
+// Interval run Player Code every 2 seconds automatically
+setInterval(runCustomCode, 2000);
+
+// Physics & Game Loop Update
+function update(dt) {
+    Game.time += dt;
+
+    // Passive Resource Generation
+    Player.power += 5 * dt;
+    Player.metal += 2 * dt;
+
+    // Update Boss AI
+    updateBossAI(dt);
+
+    // Update Player Units Behavior
+    Player.units.forEach(u => {
+        if (u.hp <= 0) return;
+
+        // Collector logic
+        if (u.type === 'COLLECTOR') {
+            let nearestNode = null;
+            let minDist = 99999;
+            Game.nodes.forEach(n => {
+                const d = Math.hypot(n.x - u.x, n.y - u.y);
+                if (d < minDist && n.amount > 0) { minDist = d; nearestNode = n; }
             });
 
-            // Di chuyển Player (4 hướng)
-            if ((keys['ArrowLeft'] || keys['KeyA']) && player.x > 0) player.x -= player.speed;
-            if ((keys['ArrowRight'] || keys['KeyD']) && player.x < cvs.width - player.w) player.x += player.speed;
-            if ((keys['ArrowUp'] || keys['KeyW']) && player.y > 0) player.y -= player.speed;
-            if ((keys['ArrowDown'] || keys['KeyS']) && player.y < cvs.height - player.h) player.y += player.speed;
-
-            // Bắn đạn
-            if (keys['Space'] && now - lastShoot > 130) {
-                bullets.push({ x: player.x + player.w / 2 - 3, y: player.y, w: 6, h: 14 });
-                playSound(600, 'square', 0.1);
-                lastShoot = now;
-            }
-
-            // Update Đạn
-            bullets = bullets.filter(b => {
-                b.y -= 9;
-                return b.y > -20;
-            });
-
-            // Spawn & Update Kẻ địch
-            spawnEnemy();
-            enemies.forEach((e, eIdx) => {
-                e.y += e.speed;
-
-                // Va chạm Player vs Enemy
-                if (e.x < player.x + player.w && e.x + e.w > player.x &&
-                    e.y < player.y + player.h && e.y + e.h > player.y) {
-                    
-                    createExplosion(player.x + player.w/2, player.y + player.h/2, '#00ffcc');
-                    createExplosion(e.x + e.w/2, e.y + e.h/2, '#ff0055');
-                    playSound(120, 'sawtooth', 0.4);
-                    triggerGameOver();
+            if (nearestNode) {
+                if (minDist > u.range) {
+                    u.x += ((nearestNode.x - u.x) / minDist) * u.speed;
+                    u.y += ((nearestNode.y - u.y) / minDist) * u.speed;
+                } else {
+                    nearestNode.amount -= 10 * dt;
+                    Player.metal += 10 * dt;
+                    Player.stats.mined += 10 * dt;
                 }
-
-                // Va chạm Đạn vs Enemy
-                bullets.forEach((b, bIdx) => {
-                    if (b.x < e.x + e.w && b.x + b.w > e.x &&
-                        b.y < e.y + e.h && b.y + b.h > e.y) {
-                        
-                        e.hp--;
-                        bullets.splice(bIdx, 1);
-                        createExplosion(b.x, b.y, '#ffea00');
-
-                        if (e.hp <= 0) {
-                            createExplosion(e.x + e.w/2, e.y + e.h/2, '#ff0055');
-                            playSound(300, 'triangle', 0.15);
-                            enemies.splice(eIdx, 1);
-                            score += 10;
-                            scoreEl.innerText = score;
-                        }
-                    }
-                });
-            });
-
-            // Lọc kẻ địch lọt khỏi màn hình
-            enemies = enemies.filter(e => e.y < cvs.height + 50);
-
-            // Update Particle hiệu ứng
-            particles.forEach((p, idx) => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.alpha -= p.life;
-                if (p.alpha <= 0) particles.splice(idx, 1);
-            });
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, cvs.width, cvs.height);
-
-            // 1. Vẽ nền sao Parallax
-            ctx.fillStyle = '#ffffff';
-            stars.forEach(s => {
-                ctx.globalAlpha = s.speed / 3;
-                ctx.fillRect(s.x, s.y, s.size, s.size);
-            });
-            ctx.globalAlpha = 1;
-
-            if (!gameOver) {
-                // 2. Vẽ Player (Thiết kế phi thuyền Neon)
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#00ffcc';
-                ctx.fillStyle = '#00ffcc';
-                ctx.beginPath();
-                ctx.moveTo(player.x + player.w / 2, player.y);
-                ctx.lineTo(player.x, player.y + player.h);
-                ctx.lineTo(player.x + player.w / 2, player.y + player.h - 8);
-                ctx.lineTo(player.x + player.w, player.y + player.h);
-                ctx.closePath();
-                ctx.fill();
-
-                // Động cơ phản lực phía sau
-                ctx.fillStyle = Math.random() > 0.5 ? '#ff0055' : '#ffea00';
-                ctx.fillRect(player.x + player.w/2 - 4, player.y + player.h - 4, 8, 8 + Math.random()*6);
             }
-
-            // 3. Vẽ Đạn Neon
-            ctx.shadowColor = '#ffea00';
-            ctx.fillStyle = '#ffea00';
-            bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
-
-            // 4. Vẽ Kẻ địch (Thiết kế phi thuyền quái vật)
-            ctx.shadowColor = '#ff0055';
-            ctx.fillStyle = '#ff0055';
-            enemies.forEach(e => {
-                ctx.beginPath();
-                ctx.moveTo(e.x, e.y);
-                ctx.lineTo(e.x + e.w, e.y);
-                ctx.lineTo(e.x + e.w / 2, e.y + e.h);
-                ctx.closePath();
-                ctx.fill();
-            });
-
-            // 5. Vẽ Hiệu ứng hạt Nổ (Particles)
-            particles.forEach(p => {
-                ctx.shadowColor = p.color;
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = p.alpha;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            ctx.globalAlpha = 1;
-            ctx.shadowBlur = 0; // Reset hiệu ứng bóng
+            return;
         }
 
-        function triggerGameOver() {
-            gameOver = true;
-            finalScoreVal.innerText = score;
-            gameOverScreen.classList.add('active');
+        // Combat Units Logic
+        if (u.state === 'RETREAT') {
+            const distToBase = Math.hypot(Player.base.x - u.x, Player.base.y - u.y);
+            if (distToBase > 60) {
+                u.x += ((Player.base.x - u.x) / distToBase) * u.speed;
+                u.y += ((Player.base.y - u.y) / distToBase) * u.speed;
+            }
+            return;
         }
 
-        function resetGame() {
-            score = 0;
-            level = 1;
-            scoreEl.innerText = 0;
-            levelEl.innerText = 1;
-            player.x = 205;
-            player.y = 550;
-            bullets = [];
-            enemies = [];
-            particles = [];
-            gameOver = false;
-            gameOverScreen.classList.remove('active');
-            requestAnimationFrame(loop);
+        // Find Targets (Boss Units or Boss Base)
+        let target = null;
+        let minDist = u.range + 1000;
+
+        Boss.units.forEach(e => {
+            if (e.hp <= 0) return;
+            const d = Math.hypot(e.x - u.x, e.y - u.y);
+            if (d < minDist) { minDist = d; target = e; }
+        });
+
+        if (!target) {
+            const dBase = Math.hypot(Boss.base.x - u.x, Boss.base.y - u.y);
+            if (dBase < minDist) { target = Boss.base; minDist = dBase; }
         }
 
-        function loop(timestamp) {
-            update(timestamp);
-            draw();
-            if (!gameOver) requestAnimationFrame(loop);
+        if (target) {
+            if (minDist > u.range) {
+                u.x += ((target.x - u.x) / minDist) * u.speed;
+                u.y += ((target.y - u.y) / minDist) * u.speed;
+            } else {
+                // Attack Target
+                target.hp -= u.damage * dt;
+                Player.stats.damage += u.damage * dt;
+
+                // Fire Bullet visual
+                if (Math.random() < 0.1) {
+                    Game.projectiles.push({ x: u.x, y: u.y, tx: target.x, ty: target.y, color: '#38bdf8', life: 0.2 });
+                }
+            }
+        } else if (u.state === 'ATTACK') {
+            // Move towards Boss side
+            u.x += u.speed;
+        }
+    });
+
+    // Update Boss Units Behavior
+    Boss.units.forEach(e => {
+        if (e.hp <= 0) return;
+
+        let target = null;
+        let minDist = e.range + 1000;
+
+        Player.units.forEach(u => {
+            if (u.hp <= 0) return;
+            const d = Math.hypot(u.x - e.x, u.y - e.y);
+            if (d < minDist) { minDist = d; target = u; }
+        });
+
+        if (!target) {
+            const dBase = Math.hypot(Player.base.x - e.x, Player.base.y - e.y);
+            if (dBase < minDist) { target = Player.base; minDist = dBase; }
         }
 
-        requestAnimationFrame(loop);
-    </script>
+        if (target) {
+            if (minDist > e.range) {
+                e.x -= ((e.x - target.x) / minDist) * e.speed;
+                e.y -= ((e.y - target.y) / minDist) * e.speed;
+            } else {
+                target.hp -= e.damage * dt;
+                if (Math.random() < 0.1) {
+                    Game.projectiles.push({ x: e.x, y: e.y, tx: target.x, ty: target.y, color: '#ef4444', life: 0.2 });
+                }
+            }
+        }
+    });
+
+    // Clean Dead Units
+    const playerKillsBefore = Boss.units.length;
+    Boss.units = Boss.units.filter(e => e.hp > 0);
+    Player.stats.kills += (playerKillsBefore - Boss.units.length);
+
+    Player.units = Player.units.filter(u => u.hp > 0);
+
+    // Update Projectiles
+    Game.projectiles.forEach(p => p.life -= dt);
+    Game.projectiles = Game.projectiles.filter(p => p.life > 0);
+
+    // Update UI Indicators
+    document.getElementById('res-power').innerText = Math.floor(Player.power);
+    document.getElementById('res-metal').innerText = Math.floor(Player.metal);
+    document.getElementById('res-units').innerText = `${Player.units.length}/50`;
+    document.getElementById('stat-damage').innerText = Math.floor(Player.stats.damage);
+    document.getElementById('stat-kills').innerText = Player.stats.kills;
+    document.getElementById('stat-mined').innerText = Math.floor(Player.stats.mined);
+
+    // Check Win/Loss Condition
+    if (Boss.base.hp <= 0) {
+        alert("CHÚC MỪNG! BẠN ĐÃ VIẾT CODE ĐẢ BẠI THÀNH CÔNG OVERLORD BOSS!");
+        Game.running = false;
+    } else if (Player.base.hp <= 0) {
+        alert("CĂN CỨ CỦA BẠN ĐÃ BỊ PHÁ HỦY! OVERLORD AI CHIẾN THẮNG!");
+        Game.running = false;
+    }
+}
+
+// Render Engine (Canvas)
+function render() {
+    ctx.clearRect(0, 0, Game.width, Game.height);
+
+    // Draw Grid Lines (Sci-Fi Background)
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+    for (let x = 0; x < Game.width; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, Game.height); ctx.stroke();
+    }
+    for (let y = 0; y < Game.height; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(Game.width, y); ctx.stroke();
+    }
+
+    // Draw Resource Nodes
+    Game.nodes.forEach(n => {
+        if (n.amount <= 0) return;
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px monospace';
+        ctx.fillText(Math.floor(n.amount), n.x - 12, n.y - 18);
+    });
+
+    // Draw Player Base
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.arc(Player.base.x, Player.base.y, Player.base.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Draw Boss Base
+    ctx.fillStyle = '#991b1b';
+    ctx.beginPath();
+    ctx.arc(Boss.base.x, Boss.base.y, Boss.base.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Draw Player Units
+    Player.units.forEach(u => {
+        ctx.fillStyle = u.color;
+        ctx.beginPath();
+        ctx.arc(u.x, u.y, u.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // HP bar above unit
+        ctx.fillStyle = 'red';
+        ctx.fillRect(u.x - 10, u.y - u.radius - 6, 20, 3);
+        ctx.fillStyle = '#22c55e';
+        ctx.fillRect(u.x - 10, u.y - u.radius - 6, (u.hp / u.maxHp) * 20, 3);
+    });
+
+    // Draw Boss Units
+    Boss.units.forEach(e => {
+        ctx.fillStyle = e.color;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // HP bar
+        ctx.fillStyle = 'red';
+        ctx.fillRect(e.x - 10, e.y - e.radius - 6, 20, 3);
+        ctx.fillStyle = '#22c55e';
+        ctx.fillRect(e.x - 10, e.y - e.radius - 6, Math.max(0, (e.hp / e.maxHp)) * 20, 3);
+    });
+
+    // Draw Laser Projectiles
+    Game.projectiles.forEach(p => {
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.tx, p.ty);
+        ctx.stroke();
+    });
+}
+
+// Main Game Loop
+let lastTime = performance.now();
+function gameLoop(now) {
+    if (!Game.running) return;
+    const dt = (now - lastTime) / 1000;
+    lastTime = now;
+
+    update(Math.min(dt, 0.1));
+    render();
+
+    requestAnimationFrame(gameLoop);
+}
+
+// Start Game
+initGame();
+requestAnimationFrame(gameLoop);
+
+</script>
 </body>
 </html>
